@@ -74,4 +74,38 @@ class JobApiTest extends TestCase
             'description' => $jobData->description,
         ]);
     }
+
+    public function test_update_job_succeeds(): void
+    {
+        $job = Job::factory()->create();
+        $updatedData = Job::factory()->make()->toArray();
+
+        $response = $this->put('/api/jobs/' . $job->id, $updatedData);
+
+        $response->assertStatus(200);
+        $response->assertHeader('Content-Type', 'application/json');
+
+        $content = $response->getContent();
+        $this->assertJson($content);
+        $decoded = json_decode($content, true);
+        $this->assertEquals($updatedData['title'], $decoded['title']);
+        $this->assertDatabaseHas('jobs', [
+            'id' => $job->id,
+            'title' => $updatedData['title'],
+        ]);
+    }
+
+    public function test_destroy_job_succeeds(): void
+    {
+        $job = Job::factory()->create();
+
+        $response = $this->delete('/api/jobs/' . $job->id);
+
+        $response->assertStatus(204);
+        $response->assertNoContent();
+
+        $this->assertDatabaseMissing('jobs', [
+            'id' => $job->id,
+        ]);
+    }
 }

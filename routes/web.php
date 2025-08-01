@@ -10,4 +10,6 @@ Route::prefix('api')->group(function () {
     Route::get('/jobs', [JobController::class, 'index'])->name('api.jobs');
     Route::get('/jobs/{id}', [JobController::class, 'show'])->name('api.jobs.show');
     Route::post('/jobs', [JobController::class, 'store'])->name('api.jobs.store');
+    Route::put('/jobs/{id}', [JobController::class, 'update'])->name('api.jobs.update');
+    Route::delete('/jobs/{id}', [JobController::class, 'destroy'])->name('api.jobs.destroy');
 });

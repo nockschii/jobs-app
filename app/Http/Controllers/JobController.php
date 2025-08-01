@@ -15,7 +15,6 @@ class JobController extends Controller
      */
     public function index(): Response
     {
-
         $jobs = Job::all()->where('is_active', true);
 
         return new Response($jobs, 200, [
@@ -37,7 +36,7 @@ class JobController extends Controller
             'Content-Type' => 'application/json',
         ]);
     }
-    
+
     /**
      * Handle the incoming request to store a new job.
      *
@@ -51,5 +50,36 @@ class JobController extends Controller
         return new Response($job, 201, [
             'Content-Type' => 'application/json',
         ]);
+    }
+
+    /**
+     * Handle the incoming request to update a job.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param int $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, int $id): Response
+    {
+        $job = Job::findOrFail($id);
+        $job->update($request->all());
+
+        return new Response($job, 200, [
+            'Content-Type' => 'application/json',
+        ]);
+    }
+
+    /**
+     * Handle the incoming request to delete a job.
+     *
+     * @param int $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(int $id): Response
+    {
+        $job = Job::findOrFail($id);
+        $job->delete();
+
+        return new Response(null, 204);
     }
 }
