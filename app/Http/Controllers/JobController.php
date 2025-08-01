@@ -13,12 +13,27 @@ class JobController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function getJobs(): Response
+    public function index(): Response
     {
 
         $jobs = Job::all()->where('is_active', true);
 
         return new Response($jobs, 200, [
+            'Content-Type' => 'application/json',
+        ]);
+    }
+
+    /**
+     * Handle the incoming request to get a job by ID.
+     *
+     * @param int $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show(int $id): Response
+    {
+        $job = Job::findOrFail($id);
+
+        return new Response($job, 200, [
             'Content-Type' => 'application/json',
         ]);
     }

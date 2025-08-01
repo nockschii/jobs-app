@@ -10,7 +10,7 @@ class JobApiTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_get_jobs_returns_empty_list(): void
+    public function test_index_returns_empty_list(): void
     {
         Job::factory()->count(0)->create();
 
@@ -24,7 +24,7 @@ class JobApiTest extends TestCase
         $this->assertEmpty(json_decode($content, true));
     }
 
-    public function test_get_jobs_returns_job_list(): void
+    public function test_index_returns_job_list(): void
     {
         Job::factory()->count(1)->create();
 
@@ -35,6 +35,24 @@ class JobApiTest extends TestCase
 
         $content = $response->getContent();
         $this->assertJson($content);
-        $this->assertNotEmpty(json_decode($content, true));
+        $decoded = json_decode($content, true);
+        $this->assertNotEmpty($decoded);
+        $this->assertCount(1, $decoded);
+    }
+
+    public function test_show_job_with_id_returns_job(): void
+    {
+        $job = Job::factory()->create();
+
+        $response = $this->get('/api/jobs/' . $job->id);
+
+        $response->assertStatus(200);
+        $response->assertHeader('Content-Type', 'application/json');
+
+        $content = $response->getContent();
+        $this->assertJson($content);
+        $decoded = json_decode($content, true);
+        $this->assertNotEmpty($decoded);
+        $this->assertEquals($job->id, $decoded['id']);
     }
 }
