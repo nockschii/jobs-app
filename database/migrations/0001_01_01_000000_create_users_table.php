@@ -19,6 +19,15 @@ return new class extends Migration
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();
+            $table->string('profile_picture')->nullable();
+            $table->string('bio', 255)->nullable();
+            $table->string('website', 255)->nullable();
+            $table->string('linkedin_url', 255)->nullable();
+            $table->string('github_url', 255)->nullable();
+            $table->string('gitlab_url', 255)->nullable();
+            $table->boolean('is_active')->default(true);
+            $table->timestamp('last_login_at')->nullable();
+            $table->string('locale', 10)->default('en'); 
         });
     }
 
