@@ -55,4 +55,23 @@ class JobApiTest extends TestCase
         $this->assertNotEmpty($decoded);
         $this->assertEquals($job->id, $decoded['id']);
     }
+
+    public function test_store_job_succeeds(): void
+    {
+        $jobData = Job::factory()->make();
+
+        $response = $this->post('/api/jobs', $jobData->toArray());
+
+        $response->assertStatus(201);
+        $response->assertHeader('Content-Type', 'application/json');
+
+        $content = $response->getContent();
+        $this->assertJson($content);
+        $decoded = json_decode($content, true);
+        $this->assertEquals($jobData->title, $decoded['title']);
+        $this->assertDatabaseHas('jobs', [
+            'title' => $jobData->title,
+            'description' => $jobData->description,
+        ]);
+    }
 }

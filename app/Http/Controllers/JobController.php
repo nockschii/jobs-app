@@ -37,4 +37,19 @@ class JobController extends Controller
             'Content-Type' => 'application/json',
         ]);
     }
+    
+    /**
+     * Handle the incoming request to store a new job.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request): Response
+    {
+        $job = Job::create($request->all());
+
+        return new Response($job, 201, [
+            'Content-Type' => 'application/json',
+        ]);
+    }
 }
