@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\JobController;
+use App\Http\Controllers\SearchController;
 
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return $request->user();
@@ -20,3 +21,5 @@ Route::get('/companies/{id}', [CompanyController::class, 'show'])->name('api.com
 Route::post('/companies', [CompanyController::class, 'store'])->name('api.companies.store');
 Route::put('/companies/{id}', [CompanyController::class, 'update'])->name('api.companies.update');
 Route::delete('/companies/{id}', [CompanyController::class, 'destroy'])->name('api.companies.destroy');
+
+Route::get('/search', [SearchController::class, 'search'])->name('api.search');
