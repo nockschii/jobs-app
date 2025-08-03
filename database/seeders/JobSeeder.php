@@ -123,7 +123,7 @@ class JobSeeder extends Seeder
         ];
 
         $departments = ['Engineering', 'Marketing', 'Sales', 'HR', 'Finance', 'Operations', 'Legal', 'Design'];
-        $hoursPerWeek = ['Full-time (38.5)', 'Full-time (40)', 'Part-time (20)', 'Part-time (32)', 'Contract'];
+        $employmentType = ['Full-time (38.5)', 'Full-time (40)', 'Part-time (20)', 'Part-time (32)', 'Contract'];
 
         if ($companies->isNotEmpty()) {
             for ($i = 0; $i < 50; $i++) {
@@ -141,7 +141,7 @@ class JobSeeder extends Seeder
                     'department' => $departments[array_rand($departments)],
                     'city' => $location['city'],
                     'country' => $location['country'],
-                    'hours_per_week' => $hoursPerWeek[array_rand($hoursPerWeek)],
+                    'employment_type' => $employmentType[array_rand($employmentType)],
                     'is_active' => $i < 45 ? true : false,
                     'created_at' => $createdAt,
                     'updated_at' => $createdAt,

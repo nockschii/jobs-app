@@ -26,7 +26,7 @@ class JobFactory extends Factory
             'country' => fake()->country(),
             'application_email' => fake()->safeEmail(),
             'application_url' => fake()->url(),
-            'hours_per_week' => fake()->randomElement(['Full-time (38.5)', 'Part-time (20)', 'Part-time (32)', 'Contract']),
+            'employment_type' => fake()->randomElement(['Full-time (38.5)', 'Part-time (20)', 'Part-time (32)', 'Contract']),
             'created_at' => now(),
             'updated_at' => now(),
         ];

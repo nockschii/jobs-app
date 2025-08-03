@@ -20,7 +20,7 @@ class Job extends Model
         'country',
         'application_email',
         'application_url',
-        'hours_per_week',
+        'employment_type',
     ];
 
     public function company(): BelongsTo

@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('country', 60);
             $table->string('application_email', 255);
             $table->string('application_url', 500);
-            $table->string('hours_per_week', 20)->nullable();
+            $table->string('employment_type', 20)->nullable();
             $table->timestamps();
         });
     }
