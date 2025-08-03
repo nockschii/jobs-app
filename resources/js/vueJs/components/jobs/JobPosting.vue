@@ -7,8 +7,8 @@
       </div>
       
       <div class="company-info">
-        <h3>{{ selectedJob.company }}</h3>
-        <p class="location">📍 {{ selectedJob.location }}</p>
+        <h3>{{ selectedJob.company?.name || 'Company not available' }}</h3>
+        <p class="location">📍 {{ formatLocation(selectedJob) }}</p>
       </div>
 
       <div class="job-description">
@@ -33,16 +33,49 @@
     <div v-else class="no-selection">
       <p>Select a job from the list to view details</p>
     </div>
+
+    <ErrorModal 
+      :show="showError" 
+      :message="errorMessage" 
+      @close="closeError" 
+    />
   </div>
 </template>
 
 <script>
+import ErrorModal from '@components/ErrorModal.vue';
+
 export default {
   name: 'JobPosting',
+  components: {
+    ErrorModal
+  },
   props: {
     selectedJob: {
       type: Object,
       default: null
+    }
+  },
+  data() {
+    return {
+      showError: false,
+      errorMessage: ''
+    }
+  },
+  methods: {
+    formatLocation(job) {
+      if (job.city && job.country) {
+        return `${job.city}, ${job.country}`;
+      }
+      return job.location || 'Location not specified';
+    },
+    showErrorModal(message) {
+      this.errorMessage = message;
+      this.showError = true;
+    },
+    closeError() {
+      this.showError = false;
+      this.errorMessage = '';
     }
   }
 }
@@ -53,6 +86,13 @@ export default {
   flex: 1;
   padding: 2rem;
   overflow-y: auto;
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: #6c757d;
+  font-style: italic;
 }
 
 .job-detail-header {

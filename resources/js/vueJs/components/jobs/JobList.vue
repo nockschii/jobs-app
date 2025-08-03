@@ -1,7 +1,10 @@
 <template>
   <div class="job-list">
     <h2>Available Jobs</h2>
-    <div class="jobs-container">
+    <div v-if="loading" class="loading">
+      Loading jobs...
+    </div>
+    <div v-else class="jobs-container">
       <JobCard 
         v-for="job in jobs" 
         :key="job.id" 
@@ -9,47 +12,58 @@
         @click="selectJob(job)"
       />
     </div>
+    <ErrorModal 
+      :show="showError" 
+      :message="errorMessage" 
+      @close="closeError" 
+    />
   </div>
 </template>
 
 <script>
 import JobCard from './JobCard.vue';
+import ErrorModal from '@components/ErrorModal.vue';
+import { fetchJobs } from '@api/jobsApi.js';
 
 export default {
   name: 'JobList',
   components: {
-    JobCard
+    JobCard,
+    ErrorModal
   },
   data() {
     return {
-      jobs: [
-        { 
-          id: 1, 
-          title: 'Frontend Developer', 
-          company: 'Tech Corp', 
-          location: 'Vienna',
-          employment_type: 'Full-time'
-        },
-        { 
-          id: 2, 
-          title: 'Backend Developer', 
-          company: 'StartupXYZ', 
-          location: 'Remote',
-          employment_type: 'Contract'
-        },
-        { 
-          id: 3, 
-          title: 'Full Stack Developer', 
-          company: 'Digital Agency', 
-          location: 'Salzburg',
-          employment_type: 'Part-time'
-        }
-      ]
+      jobs: [],
+      loading: false,
+      showError: false,
+      errorMessage: ''
     }
   },
+  async mounted() {
+    await this.loadJobs();
+  },
   methods: {
+    async loadJobs() {
+      this.loading = true;
+      try {
+        const response = await fetchJobs();
+        this.jobs = response.data;
+      } catch (error) {
+        this.showErrorModal('Failed to load jobs: ' + (error.response?.data?.message || error.message));
+      } finally {
+        this.loading = false;
+      }
+    },
     selectJob(job) {
       this.$emit('job-selected', job);
+    },
+    showErrorModal(message) {
+      this.errorMessage = message;
+      this.showError = true;
+    },
+    closeError() {
+      this.showError = false;
+      this.errorMessage = '';
     }
   }
 }
@@ -67,6 +81,13 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: #6c757d;
+  font-style: italic;
 }
 
 h2 {

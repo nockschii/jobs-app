@@ -4,8 +4,8 @@
       <h3 class="job-card__title">{{ job.title }}</h3>
       <span class="job-card__employment-type">{{ job.employment_type }}</span>
     </div>
-    <div class="job-card__company">{{ job.company }}</div>
-    <div class="job-card__location">{{ job.location }}</div>
+    <div class="job-card__company">{{ job.company?.name || 'Company not available' }}</div>
+    <div class="job-card__location">{{ formatLocation(job) }}</div>
   </div>
 </template>
 
@@ -18,7 +18,15 @@ export default {
       required: true
     }
   },
-  emits: ['click']
+  emits: ['click'],
+  methods: {
+    formatLocation(job) {
+      if (job.city && job.country) {
+        return `${job.city}, ${job.country}`;
+      }
+      return job.location || 'Location not specified';
+    }
+  }
 }
 </script>
 
