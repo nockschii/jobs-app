@@ -1,14 +1,17 @@
 <template>
-    <Main />
+    <Navigation />
+    <HomePage />
 </template>
 
 <script>
-    import Main from './components/Main.vue';
+    import HomePage from './components/pages/HomePage.vue';
+    import Navigation from './components/Navigation.vue';
 
     export default {
         name: 'App',
         components: {
-            Main
+            HomePage,
+            Navigation,
         }
     };
 </script>
