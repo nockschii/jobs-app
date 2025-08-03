@@ -48,16 +48,16 @@ class SearchApiTest extends TestCase
     }
 
     #[DataProvider('similarMatchDataProvider')]
-    public function test_search_returns_multiple_matching_jobs(string $searchTerm, array $expectedTitles): void
+    public function test_search_returns_multiple_matching_jobs(string $searchTerm, array $expectedResults): void
     {
         $company = Company::factory()->create();
 
         $jobs = [];
-        foreach ($expectedTitles as $title) {
+        foreach ($expectedResults as $result) {
             $jobs[] = Job::factory()->create([
                 'company_id' => $company->id,
                 'is_active' => true,
-                'title' => $title
+                'title' => $result
             ]);
         }
 
@@ -66,9 +66,8 @@ class SearchApiTest extends TestCase
         $response->assertStatus(200);
         $response->assertHeader('Content-Type', 'application/json');
         $content = json_decode($response->getContent(), true);
-        $this->assertCount(count($expectedTitles), $content);
+        $this->assertCount(count($expectedResults), $content);
 
-        // Check that all expected jobs are returned
         $returnedIds = array_column($content, 'id');
         foreach ($jobs as $job) {
             $this->assertContains($job->id, $returnedIds);
