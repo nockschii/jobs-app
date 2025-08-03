@@ -11,8 +11,18 @@
         :search-active="isSearchActive"
         @job-selected="handleJobSelection" 
       />
-      <JobPosting :selected-job="selectedJob" />
+      <JobPosting 
+        :selected-job="selectedJobDetails" 
+        :loading="loadingJobDetails"
+        @error="handleJobError"
+      />
     </div>
+
+    <ErrorModal 
+      :show="showError" 
+      :message="errorMessage" 
+      @close="closeError" 
+    />
   </div>
 </template>
 
@@ -20,24 +30,30 @@
 import SearchBar from '../search/SearchBar.vue';
 import JobList from '../jobs/JobList.vue';
 import JobPosting from '../jobs/JobPosting.vue';
+import ErrorModal from '../ErrorModal.vue';
 import { searchJobs } from '@api/searchApi.js';
-import { fetchJobs } from '@api/jobsApi.js';
+import { fetchJobs, fetchJobDetails } from '@api/jobsApi.js';
 
 export default {
   name: 'HomePage',
   components: {
     SearchBar,
     JobList,
-    JobPosting
+    JobPosting,
+    ErrorModal
   },
   data() {
     return {
       selectedJob: null,
+      selectedJobDetails: null,
       allJobs: [],
       searchResults: [],
       searchLoading: false,
       isSearchActive: false,
-      loadingAllJobs: false
+      loadingAllJobs: false,
+      loadingJobDetails: false,
+      showError: false,
+      errorMessage: ''
     }
   },
   computed: {
@@ -55,13 +71,26 @@ export default {
         const response = await fetchJobs();
         this.allJobs = response.data;
       } catch (error) {
-        console.error('Failed to load all jobs:', error);
+        this.handleApiError(error, 'Loading jobs');
       } finally {
         this.loadingAllJobs = false;
       }
     },
-    handleJobSelection(job) {
+    async handleJobSelection(job) {
       this.selectedJob = job;
+      this.selectedJobDetails = null; // Reset previous details
+      this.loadingJobDetails = true;
+      
+      try {
+        const response = await fetchJobDetails(job.id);
+        this.selectedJobDetails = response.data;
+      } catch (error) {
+        this.handleApiError(error, 'Job details loading');
+        this.selectedJob = null;
+        this.selectedJobDetails = null;
+      } finally {
+        this.loadingJobDetails = false;
+      }
     },
     async handleSearch(searchTerm) {
       if (!searchTerm || searchTerm.trim() === '') {
@@ -78,11 +107,34 @@ export default {
         const response = await searchJobs(searchTerm);
         this.searchResults = response.data;
       } catch (error) {
-        console.error('Search failed:', error);
+        this.handleApiError(error, 'Search');
         this.searchResults = [];
       } finally {
         this.searchLoading = false;
       }
+    },
+    handleApiError(error, context = 'Operation') {
+      console.error(`${context} failed:`, error);
+      this.showError = true;
+      
+      let errorMessage;
+      if (context === 'Search') {
+        errorMessage = `Search failed: ${error.response?.data?.message || error.message || 'Unable to perform search. Please check your connection and try again.'}`;
+      } else if (context === 'Job details loading') {
+        errorMessage = `Failed to load job details: ${error.response?.data?.message || error.message || 'Unknown error occurred'}`;
+      } else {
+        errorMessage = `${context} failed: ${error.response?.data?.message || error.message || 'An error occurred'}`;
+      }
+      
+      this.errorMessage = errorMessage;
+    },
+    handleJobError(errorMessage) {
+      this.showError = true;
+      this.errorMessage = errorMessage;
+    },
+    closeError() {
+      this.showError = false;
+      this.errorMessage = '';
     }
   }
 }

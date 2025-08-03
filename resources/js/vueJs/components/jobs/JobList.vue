@@ -28,24 +28,16 @@
         @click="selectJob(job)"
       />
     </div>
-    
-    <ErrorModal 
-      :show="showError" 
-      :message="errorMessage" 
-      @close="closeError" 
-    />
   </div>
 </template>
 
 <script>
 import JobCard from './JobCard.vue';
-import ErrorModal from '@components/ErrorModal.vue';
 
 export default {
   name: 'JobList',
   components: {
-    JobCard,
-    ErrorModal
+    JobCard
   },
   props: {
     jobs: {
@@ -62,22 +54,11 @@ export default {
     }
   },
   data() {
-    return {
-      showError: false,
-      errorMessage: ''
-    }
+    return {}
   },
   methods: {
     selectJob(job) {
       this.$emit('job-selected', job);
-    },
-    showErrorModal(message) {
-      this.errorMessage = message;
-      this.showError = true;
-    },
-    closeError() {
-      this.showError = false;
-      this.errorMessage = '';
     }
   }
 }

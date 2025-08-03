@@ -1,6 +1,10 @@
 <template>
   <div class="job-posting">
-    <div v-if="selectedJob" class="job-detail">
+    <div v-if="loading" class="loading">
+      <p>Loading job details...</p>
+    </div>
+    
+    <div v-else-if="selectedJob" class="job-detail">
       <div class="job-detail-header">
         <h1>{{ selectedJob.title }}</h1>
         <span class="employment-badge">{{ selectedJob.employment_type }}</span>
@@ -33,34 +37,24 @@
     <div v-else class="no-selection">
       <p>Select a job from the list to view details</p>
     </div>
-
-    <ErrorModal 
-      :show="showError" 
-      :message="errorMessage" 
-      @close="closeError" 
-    />
   </div>
 </template>
 
 <script>
-import ErrorModal from '@components/ErrorModal.vue';
-
 export default {
   name: 'JobPosting',
-  components: {
-    ErrorModal
-  },
   props: {
     selectedJob: {
       type: Object,
       default: null
+    },
+    loading: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
-    return {
-      showError: false,
-      errorMessage: ''
-    }
+    return {}
   },
   methods: {
     formatLocation(job) {
@@ -68,14 +62,6 @@ export default {
         return `${job.city}, ${job.country}`;
       }
       return job.location || 'Location not specified';
-    },
-    showErrorModal(message) {
-      this.errorMessage = message;
-      this.showError = true;
-    },
-    closeError() {
-      this.showError = false;
-      this.errorMessage = '';
     }
   }
 }
@@ -165,6 +151,15 @@ export default {
   justify-content: center;
   height: 100%;
   color: #495057;
+  font-style: italic;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #6c757d;
   font-style: italic;
 }
 </style>

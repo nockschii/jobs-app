@@ -15,7 +15,7 @@ export function fetchJobs() {
  * @param {number|string} id
  * @returns {Promise}
  */
-export function fetchJob(id) {
+export function fetchJobDetails(id) {
   return axios.get(`${BASE_URL}/${id}`);
 }
 
@@ -49,7 +49,7 @@ export function deleteJob(id) {
 
 export default {
   fetchJobs,
-  fetchJob,
+  fetchJobDetails,
   createJob,
   updateJob,
   deleteJob
