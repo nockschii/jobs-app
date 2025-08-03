@@ -19,13 +19,19 @@ class SearchApiTest extends TestCase
         $response->assertJson([]);
     }
 
+    public function test_search_returns_empty_array_when_no_matching_jobs(): void
+    {
+        $response = $this->get('/api/search?searchterm=NonExistentJob');
+        $response->assertStatus(200);
+        $response->assertJson([]);
+    }
+
     #[DataProvider('searchDataProvider')]
     public function test_singular_word_search_exact_match_returns_matching_job(string $field, string $value, string $searchTerm): void
     {
         $company = Company::factory()->create();
         $job = Job::factory()->create([
             'company_id' => $company->id,
-            'is_active' => true,
             $field => $value
         ]);
 
@@ -56,7 +62,6 @@ class SearchApiTest extends TestCase
         foreach ($expectedResults as $result) {
             $jobs[] = Job::factory()->create([
                 'company_id' => $company->id,
-                'is_active' => true,
                 'title' => $result
             ]);
         }
@@ -83,10 +88,51 @@ class SearchApiTest extends TestCase
         ];
     }
 
-    public function test_search_returns_empty_array_when_no_matching_jobs(): void
+    public function test_search_excludes_inactive_jobs_returns_active_jobs(): void
     {
-        $response = $this->get('/api/search?searchterm=NonExistentJob');
+        $company = Company::factory()->create();
+
+        $activeJob = Job::factory()->create([
+            'company_id' => $company->id,
+            'title' => 'PHP Developer',
+            'is_active' => true
+        ]);
+
+        Job::factory()->create([
+            'company_id' => $company->id,
+            'title' => 'PHP Developer',
+            'is_active' => false
+        ]);
+
+        $response = $this->get('/api/search?searchterm=PHP');
+
         $response->assertStatus(200);
-        $response->assertJson([]);
+        $content = json_decode($response->getContent(), true);
+        $this->assertCount(1, $content);
+        $this->assertEquals($activeJob->id, $content[0]['id']);
     }
+
+    public function test_search_is_case_insensitive_returns_jobs(): void
+    {
+        $company = Company::factory()->create();
+
+        $job1 = Job::factory()->create([
+            'company_id' => $company->id,
+            'title' => 'PHP Developer',
+        ]);
+
+        Job::factory()->create([
+            'company_id' => $company->id,
+            'title' => 'php developer',
+        ]);
+
+        $response = $this->get('/api/search?searchterm=PHP');
+
+        $response->assertStatus(200);
+        $content = json_decode($response->getContent(), true);
+        $this->assertCount(2, $content);
+        $this->assertEquals($job1->id, $content[0]['id']);
+    }
+
+
 }
