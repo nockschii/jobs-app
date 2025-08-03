@@ -54,7 +54,7 @@ class SearchApiTest extends TestCase
     }
 
     #[DataProvider('similarMatchDataProvider')]
-    public function test_search_returns_multiple_matching_jobs(string $searchTerm, array $expectedResults): void
+    public function test_singular_word_search_returns_multiple_matching_jobs(string $searchTerm, array $expectedResults): void
     {
         $company = Company::factory()->create();
 
@@ -83,6 +83,7 @@ class SearchApiTest extends TestCase
     {
         return [
             ['Developer', ['PHP Developer', 'Java Developer']],
+            ['PHP Developer', ['Senior PHP Developer', 'Junior PHP Developer']],
             ['Script', ['JavaScript Developer', 'TypeScript Engineer']],
             ['Engineer', ['Software Engineer', 'DevOps Engineer']],
         ];
