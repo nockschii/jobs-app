@@ -1,11 +1,16 @@
 <template>
   <div class="home-page">
     <div class="search-section">
-      <SearchBar @search="handleSearch" />
+      <SearchBar @search="handleSearch" :loading="searchLoading" />
     </div>
     
     <div class="content">
-      <JobList @job-selected="handleJobSelection" />
+      <JobList 
+        :jobs="displayJobs" 
+        :loading="searchLoading" 
+        :search-active="isSearchActive"
+        @job-selected="handleJobSelection" 
+      />
       <JobPosting :selected-job="selectedJob" />
     </div>
   </div>
@@ -15,6 +20,8 @@
 import SearchBar from '../search/SearchBar.vue';
 import JobList from '../jobs/JobList.vue';
 import JobPosting from '../jobs/JobPosting.vue';
+import { searchJobs } from '@api/searchApi.js';
+import { fetchJobs } from '@api/jobsApi.js';
 
 export default {
   name: 'HomePage',
@@ -26,17 +33,56 @@ export default {
   data() {
     return {
       selectedJob: null,
-      searchQuery: ''
+      allJobs: [],
+      searchResults: [],
+      searchLoading: false,
+      isSearchActive: false,
+      loadingAllJobs: false
     }
   },
+  computed: {
+    displayJobs() {
+      return this.isSearchActive ? this.searchResults : this.allJobs;
+    }
+  },
+  async mounted() {
+    await this.loadAllJobs();
+  },
   methods: {
+    async loadAllJobs() {
+      this.loadingAllJobs = true;
+      try {
+        const response = await fetchJobs();
+        this.allJobs = response.data;
+      } catch (error) {
+        console.error('Failed to load all jobs:', error);
+      } finally {
+        this.loadingAllJobs = false;
+      }
+    },
     handleJobSelection(job) {
       this.selectedJob = job;
     },
-    handleSearch(query) {
-      this.searchQuery = query;
-      // TODO: API call für search
-      console.log('Searching for:', query);
+    async handleSearch(searchTerm) {
+      if (!searchTerm || searchTerm.trim() === '') {
+        // Keine Suche - zeige alle Jobs
+        this.isSearchActive = false;
+        this.searchResults = [];
+        return;
+      }
+
+      this.searchLoading = true;
+      this.isSearchActive = true;
+      
+      try {
+        const response = await searchJobs(searchTerm);
+        this.searchResults = response.data;
+      } catch (error) {
+        console.error('Search failed:', error);
+        this.searchResults = [];
+      } finally {
+        this.searchLoading = false;
+      }
     }
   }
 }

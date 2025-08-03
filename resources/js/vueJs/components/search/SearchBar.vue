@@ -5,29 +5,25 @@
         <input 
           type="text" 
           v-model="searchQuery"
-          placeholder="Search for job title..."
+          placeholder="Search for jobs by title, city or country..."
           class="search-input"
           @keyup.enter="performSearch"
         />
-        <button @click="performSearch" class="search-btn">Search</button>
+        <button 
+          v-if="searchQuery" 
+          @click="clearSearch" 
+          class="clear-search-btn"
+          type="button"
+        >
+          ✕
+        </button>
+        <button @click="performSearch" class="search-btn" :disabled="loading">
+          {{ loading ? 'Searching...' : 'Search' }}
+        </button>
       </div>
       
-      <div class="filters">
-        <select v-model="locationFilter" class="filter-select">
-          <option value="">All Locations</option>
-          <option value="Vienna">Vienna</option>
-          <option value="Remote">Remote</option>
-          <option value="Salzburg">Salzburg</option>
-        </select>
-        
-        <select v-model="employmentTypeFilter" class="filter-select">
-          <option value="">All Types</option>
-          <option value="Full-time">Full-time</option>
-          <option value="Part-time">Part-time</option>
-          <option value="Contract">Contract</option>
-        </select>
-        
-        <button @click="clearFilters" class="clear-btn">Clear</button>
+      <div class="search-info" v-if="searchQuery">
+        <small>Searching in job titles, cities and countries</small>
       </div>
     </div>
   </div>
@@ -36,27 +32,28 @@
 <script>
 export default {
   name: 'SearchBar',
+  props: {
+    loading: {
+      type: Boolean,
+      default: false
+    }
+  },
   data() {
     return {
-      searchQuery: '',
-      locationFilter: '',
-      employmentTypeFilter: ''
+      searchQuery: ''
     }
   },
   methods: {
     performSearch() {
-      const searchData = {
-        query: this.searchQuery,
-        location: this.locationFilter,
-        employment_type: this.employmentTypeFilter
-      };
-      this.$emit('search', searchData);
+      if (!this.searchQuery.trim()) {
+        this.$emit('search', '');
+        return;
+      }
+      this.$emit('search', this.searchQuery.trim());
     },
-    clearFilters() {
+    clearSearch() {
       this.searchQuery = '';
-      this.locationFilter = '';
-      this.employmentTypeFilter = '';
-      this.performSearch();
+      this.$emit('search', '');
     }
   }
 }
@@ -76,6 +73,7 @@ export default {
 .search-input-group {
   display: flex;
   gap: 0.5rem;
+  position: relative;
 }
 
 .search-input {
@@ -85,6 +83,23 @@ export default {
   border-radius: 4px;
 }
 
+.clear-search-btn {
+  position: absolute;
+  right: 120px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #6c757d;
+  cursor: pointer;
+  padding: 0.25rem;
+  font-size: 1rem;
+}
+
+.clear-search-btn:hover {
+  color: #dc3545;
+}
+
 .search-btn {
   background: #007bff;
   color: white;
@@ -92,10 +107,22 @@ export default {
   padding: 0.5rem 1rem;
   border-radius: 4px;
   cursor: pointer;
+  min-width: 100px;
 }
 
 .search-btn:hover {
   background: #0056b3;
+}
+
+.search-btn:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
+.search-info {
+  color: #6c757d;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
 }
 
 .filters {

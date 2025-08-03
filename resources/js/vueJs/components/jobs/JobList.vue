@@ -1,9 +1,25 @@
 <template>
   <div class="job-list">
-    <h2>Available Jobs</h2>
-    <div v-if="loading" class="loading">
-      Loading jobs...
+    <div class="job-list-header">
+      <h2>{{ searchActive ? 'Search Results' : 'Available Jobs' }}</h2>
+      <span v-if="searchActive" class="results-count">
+        {{ jobs.length }} {{ jobs.length === 1 ? 'result' : 'results' }} found
+      </span>
     </div>
+    
+    <div v-if="loading" class="loading">
+      {{ searchActive ? 'Searching...' : 'Loading jobs...' }}
+    </div>
+    
+    <div v-else-if="jobs.length === 0 && searchActive" class="no-results">
+      <p>No jobs found for your search.</p>
+      <small>Try different keywords or check spelling.</small>
+    </div>
+    
+    <div v-else-if="jobs.length === 0" class="no-jobs">
+      <p>No jobs available at the moment.</p>
+    </div>
+    
     <div v-else class="jobs-container">
       <JobCard 
         v-for="job in jobs" 
@@ -12,6 +28,7 @@
         @click="selectJob(job)"
       />
     </div>
+    
     <ErrorModal 
       :show="showError" 
       :message="errorMessage" 
@@ -23,7 +40,6 @@
 <script>
 import JobCard from './JobCard.vue';
 import ErrorModal from '@components/ErrorModal.vue';
-import { fetchJobs } from '@api/jobsApi.js';
 
 export default {
   name: 'JobList',
@@ -31,29 +47,27 @@ export default {
     JobCard,
     ErrorModal
   },
+  props: {
+    jobs: {
+      type: Array,
+      default: () => []
+    },
+    loading: {
+      type: Boolean,
+      default: false
+    },
+    searchActive: {
+      type: Boolean,
+      default: false
+    }
+  },
   data() {
     return {
-      jobs: [],
-      loading: false,
       showError: false,
       errorMessage: ''
     }
   },
-  async mounted() {
-    await this.loadJobs();
-  },
   methods: {
-    async loadJobs() {
-      this.loading = true;
-      try {
-        const response = await fetchJobs();
-        this.jobs = response.data;
-      } catch (error) {
-        this.showErrorModal('Failed to load jobs: ' + (error.response?.data?.message || error.message));
-      } finally {
-        this.loading = false;
-      }
-    },
     selectJob(job) {
       this.$emit('job-selected', job);
     },
@@ -77,6 +91,19 @@ export default {
   overflow-y: auto;
 }
 
+.job-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.results-count {
+  color: #6c757d;
+  font-size: 0.875rem;
+  font-weight: normal;
+}
+
 .jobs-container {
   display: flex;
   flex-direction: column;
@@ -90,8 +117,24 @@ export default {
   font-style: italic;
 }
 
+.no-results, .no-jobs {
+  text-align: center;
+  padding: 2rem;
+  color: #6c757d;
+}
+
+.no-results p, .no-jobs p {
+  margin-bottom: 0.5rem;
+  font-size: 1.125rem;
+}
+
+.no-results small {
+  color: #9ca3af;
+}
+
 h2 {
-  margin-bottom: 1rem;
+  margin: 0;
   color: #303030;
+  font-size: 1.25rem;
 }
 </style>
