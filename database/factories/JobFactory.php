@@ -22,7 +22,6 @@ class JobFactory extends Factory
             'title' => fake()->jobTitle(),
             'description' => fake()->paragraphs(3, true),
             'department' => fake()->randomElement(['Engineering', 'Marketing', 'Sales', 'HR', 'Finance']),
-            'location' => fake()->city(),
             'city' => fake()->city(),
             'country' => fake()->country(),
             'application_email' => fake()->safeEmail(),

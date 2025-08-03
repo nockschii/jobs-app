@@ -16,7 +16,6 @@ class Job extends Model
         'company_id',
         'is_active',
         'department',
-        'location',
         'city',
         'country',
         'application_email',

@@ -16,7 +16,6 @@ return new class extends Migration
             $table->string('title', 120);
             $table->longText('description')->nullable();
             $table->string('department', 50);
-            $table->string('location', 100);
             $table->string('city', 60);
             $table->string('country', 60);
             $table->string('application_email', 255);
