@@ -15,7 +15,7 @@ class JobController extends Controller
      */
     public function index(): Response
     {
-        $jobs = Job::all()->where('is_active', true);
+        $jobs = Job::with('company')->where('is_active', true)->get();
 
         return new Response($jobs, 200, [
             'Content-Type' => 'application/json',
@@ -30,7 +30,7 @@ class JobController extends Controller
      */
     public function show(int $id): Response
     {
-        $job = Job::findOrFail($id);
+        $job = Job::with('company')->findOrFail($id);
 
         return new Response($job, 200, [
             'Content-Type' => 'application/json',
