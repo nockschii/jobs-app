@@ -1,23 +1,23 @@
 <template>
   <div class="job-list">
     <div class="job-list-header">
-      <h2>{{ searchActive ? 'Search Results' : 'Available Jobs' }}</h2>
+      <h2>{{ searchActive ? 'Suchergebnisse' : 'Verfügbare Stellen' }}</h2>
       <span v-if="searchActive" class="results-count">
-        {{ jobs.length }} {{ jobs.length === 1 ? 'result' : 'results' }} found
+        {{ jobs.length }} {{ jobs.length === 1 ? 'Ergebnis' : 'Ergebnisse' }} gefunden
       </span>
     </div>
     
     <div v-if="loading" class="loading">
-      {{ searchActive ? 'Searching...' : 'Loading jobs...' }}
+      {{ searchActive ? 'Suche läuft...' : 'Lade Stellenausschreibungen...' }}
     </div>
     
     <div v-else-if="jobs.length === 0 && searchActive" class="no-results">
-      <p>No jobs found for your search.</p>
-      <small>Try different keywords or check spelling.</small>
+      <p>Keine Stellenausschreibungen für Ihre Suche gefunden.</p>
+      <small>Versuchen Sie andere Suchbegriffe oder überprüfen Sie die Schreibweise.</small>
     </div>
     
     <div v-else-if="jobs.length === 0" class="no-jobs">
-      <p>No jobs available at the moment.</p>
+      <p>Momentan sind keine Stellenausschreibungen verfügbar.</p>
     </div>
     
     <div v-else class="jobs-container">

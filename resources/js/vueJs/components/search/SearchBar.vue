@@ -5,7 +5,7 @@
         <input 
           type="text" 
           v-model="searchQuery"
-          placeholder="Search for jobs by title, city or country..."
+          placeholder="Suche nach Jobtitel, Stadt oder Land..."
           class="search-input"
           @keyup.enter="performSearch"
         />
@@ -18,12 +18,12 @@
           ✕
         </button>
         <button @click="performSearch" class="search-btn" :disabled="loading">
-          {{ loading ? 'Searching...' : 'Search' }}
+          {{ loading ? 'Suche...' : 'Suchen' }}
         </button>
       </div>
       
       <div class="search-info" v-if="searchQuery">
-        <small>Searching in job titles, cities and countries</small>
+        <small>Suche in Stellentiteln, Städten und Ländern</small>
       </div>
     </div>
   </div>
