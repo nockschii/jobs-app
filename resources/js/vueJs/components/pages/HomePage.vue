@@ -78,7 +78,7 @@ export default {
     },
     async handleJobSelection(job) {
       this.selectedJob = job;
-      this.selectedJobDetails = null; // Reset previous details
+      this.selectedJobDetails = null;
       this.loadingJobDetails = true;
       
       try {
@@ -94,7 +94,6 @@ export default {
     },
     async handleSearch(searchTerm) {
       if (!searchTerm || searchTerm.trim() === '') {
-        // Keine Suche - zeige alle Jobs
         this.isSearchActive = false;
         this.searchResults = [];
         return;
@@ -114,7 +113,6 @@ export default {
       }
     },
     handleApiError(error, context = 'Operation') {
-      console.error(`${context} failed:`, error);
       this.showError = true;
       
       let errorMessage;

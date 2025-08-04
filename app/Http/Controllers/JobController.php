@@ -8,11 +8,6 @@ use App\Models\Job;
 
 class JobController extends Controller
 {
-    /**
-     * Handle the incoming request to get jobs.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index(): Response
     {
         $jobs = Job::with('company')->where('is_active', true)->get();
@@ -22,12 +17,6 @@ class JobController extends Controller
         ]);
     }
 
-    /**
-     * Handle the incoming request to get a job by ID.
-     *
-     * @param int $id
-     * @return \Illuminate\Http\Response
-     */
     public function show(int $id): Response
     {
         $job = Job::with('company')->findOrFail($id);
@@ -37,12 +26,6 @@ class JobController extends Controller
         ]);
     }
 
-    /**
-     * Handle the incoming request to store a new job.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request): Response
     {
         $job = Job::create($request->all());
@@ -52,13 +35,6 @@ class JobController extends Controller
         ]);
     }
 
-    /**
-     * Handle the incoming request to update a job.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @param int $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, int $id): Response
     {
         $job = Job::findOrFail($id);
@@ -69,12 +45,6 @@ class JobController extends Controller
         ]);
     }
 
-    /**
-     * Handle the incoming request to delete a job.
-     *
-     * @param int $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy(int $id): Response
     {
         $job = Job::findOrFail($id);

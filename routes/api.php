@@ -5,6 +5,12 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\Auth\AuthenticationController;
+
+// Authentication routes (need session middleware)
+Route::middleware(['web'])->group(function () {
+    Route::post('/login', [AuthenticationController::class, 'store']);
+});
 
 // Public routes (no authentication required)
 Route::get('/jobs', [JobController::class, 'index'])->name('api.jobs');
@@ -14,10 +20,10 @@ Route::get('/companies/{id}', [CompanyController::class, 'show'])->name('api.com
 Route::get('/search', [SearchController::class, 'search'])->name('api.search');
 
 // Protected routes (authentication required)
-Route::middleware(['auth:sanctum'])->group(function () {
-    Route::get('/user', function (Request $request) {
-        return $request->user();
-    });
+Route::middleware(['web', 'auth:sanctum'])->group(function () {
+    Route::get('/user', [AuthenticationController::class, 'user']);
+
+    Route::post('/logout', [AuthenticationController::class, 'destroy']);
 
     Route::post('/jobs', [JobController::class, 'store'])->name('api.jobs.store');
     Route::put('/jobs/{id}', [JobController::class, 'update'])->name('api.jobs.update');
@@ -27,4 +33,3 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/companies/{id}', [CompanyController::class, 'update'])->name('api.companies.update');
     Route::delete('/companies/{id}', [CompanyController::class, 'destroy'])->name('api.companies.destroy');
 });
-
