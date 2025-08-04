@@ -4,15 +4,14 @@
       <a href="/">Job Board</a>
     </div>
     <div class="nav-right">
-      <!-- Menu nur für eingeloggte User -->
-      <div v-if="user" class="nav-menu">
+      <div v-if="user" class="nav-menu" ref="menuContainer">
         <button class="menu-btn" @click="toggleMenu">
           Menu ▼
         </button>
-        <div class="dropdown" v-show="showMenu">
-          <a href="#">Add Job</a>
-          <a href="#">My Jobs</a>
-          <a href="#">My Companies</a>
+        <div class="dropdown" v-show="showMenu" @click.stop>
+          <a href="/jobs/create">Add Job</a>
+          <a href="#" @click="showMenu = false">My Jobs</a>
+          <a href="#" @click="showMenu = false">My Companies</a>
         </div>
       </div>
       
@@ -40,9 +39,19 @@ export default {
       showMenu: false
     }
   },
+  mounted() {
+    document.addEventListener('click', this.closeMenu);
+  },
+  beforeUnmount() {
+    document.removeEventListener('click', this.closeMenu);
+  },
   methods: {
-    toggleMenu() {
+    toggleMenu(event) {
+      event.stopPropagation();
       this.showMenu = !this.showMenu;
+    },
+    closeMenu() {
+      this.showMenu = false;
     },
     openLoginModal() {
       this.$emit('open-login');
@@ -73,13 +82,29 @@ export default {
   position: relative;
 }
 
+.menu-btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: white;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.menu-btn:hover {
+  background: #f5f5f5;
+}
+
 .dropdown {
   position: absolute;
   top: 100%;
   right: 0;
   background: white;
   border: 1px solid #ccc;
+  border-radius: 4px;
   min-width: 150px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
 }
 
 .dropdown a {

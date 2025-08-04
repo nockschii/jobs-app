@@ -58,6 +58,8 @@ class CompanyApiTest extends TestCase
 
     public function test_store_company_succeeds(): void
     {
+        $this->withoutMiddleware();
+
         $companyData = Company::factory()->make();
 
         $response = $this->post('/api/companies', $companyData->toArray());
@@ -77,6 +79,8 @@ class CompanyApiTest extends TestCase
 
     public function test_update_company_succeeds(): void
     {
+        $this->withoutMiddleware();
+
         $company = Company::factory()->create();
         $updatedData = Company::factory()->make()->toArray();
 
@@ -97,6 +101,8 @@ class CompanyApiTest extends TestCase
 
     public function test_destroy_company_succeeds(): void
     {
+        $this->withoutMiddleware();
+
         $company = Company::factory()->create();
 
         $response = $this->delete('/api/companies/' . $company->id);

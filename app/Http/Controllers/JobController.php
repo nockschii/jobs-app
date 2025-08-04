@@ -10,7 +10,10 @@ class JobController extends Controller
 {
     public function index(): Response
     {
-        $jobs = Job::with('company')->where('is_active', true)->get();
+        $jobs = Job::with('company')
+            ->where('is_active', true)
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         return new Response($jobs, 200, [
             'Content-Type' => 'application/json',

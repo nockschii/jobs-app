@@ -4,7 +4,9 @@
       @open-login="showLoginModal = true" 
       @logout="handleLogout"
     />
+    
     <HomePage />
+    
     <LoginModal 
       :show="showLoginModal" 
       @close="showLoginModal = false" 

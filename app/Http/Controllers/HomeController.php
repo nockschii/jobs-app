@@ -10,4 +10,9 @@ class HomeController extends Controller
     {
         return view('welcome');
     }
+
+    public function create()
+    {
+        return view('jobs.create');
+    }
 }
