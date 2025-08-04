@@ -4,7 +4,8 @@
       <a href="/">Job Board</a>
     </div>
     <div class="nav-right">
-      <div class="nav-menu">
+      <!-- Menu nur für eingeloggte User -->
+      <div v-if="user" class="nav-menu">
         <button class="menu-btn" @click="toggleMenu">
           Menu ▼
         </button>
@@ -14,7 +15,13 @@
           <a href="#">My Companies</a>
         </div>
       </div>
-      <button class="login-btn">Login</button>
+      
+      <!-- Show different content based on login status -->
+      <div v-if="user" class="user-info">
+        <span class="welcome-text">Hi, {{ user.name }}!</span>
+        <button class="logout-btn" @click="handleLogout">Logout</button>
+      </div>
+      <button v-else class="login-btn" @click="openLoginModal">Login</button>
     </div>
   </nav>
 </template>
@@ -22,6 +29,12 @@
 <script>
 export default {
   name: 'Navigation',
+  props: {
+    user: {
+      type: Object,
+      default: null
+    }
+  },
   data() {
     return {
       showMenu: false
@@ -30,6 +43,12 @@ export default {
   methods: {
     toggleMenu() {
       this.showMenu = !this.showMenu;
+    },
+    openLoginModal() {
+      this.$emit('open-login');
+    },
+    handleLogout() {
+      this.$emit('logout');
     }
   }
 }
@@ -72,5 +91,42 @@ export default {
 
 .dropdown a:hover {
   background: #f5f5f5;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.welcome-text {
+  color: #333;
+  font-weight: 500;
+}
+
+.login-btn, .logout-btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.login-btn {
+  background: #4f46e5;
+  color: white;
+}
+
+.login-btn:hover {
+  background: #4338ca;
+}
+
+.logout-btn {
+  background: #ef4444;
+  color: white;
+}
+
+.logout-btn:hover {
+  background: #dc2626;
 }
 </style>
