@@ -51,4 +51,12 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Company::class, 'user_companies', 'user_id', 'company_id');
     }
+
+    public function isOwnerOf(Company $company): bool
+    {
+        return $this->companies()
+            ->wherePivot('company_id', $company->id)
+            ->wherePivot('role', 'owner')
+            ->exists();
+    }
 }

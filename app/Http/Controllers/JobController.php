@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Models\Job;
+use App\Http\Requests\JobStoreRequest;
+use App\Http\Requests\JobUpdateRequest;
 
 class JobController extends Controller
 {
@@ -29,19 +31,19 @@ class JobController extends Controller
         ]);
     }
 
-    public function store(Request $request): Response
+    public function store(JobStoreRequest $request): Response
     {
-        $job = Job::create($request->all());
+        $job = Job::create($request->validated());
 
         return new Response($job, 201, [
             'Content-Type' => 'application/json',
         ]);
     }
 
-    public function update(Request $request, int $id): Response
+    public function update(JobUpdateRequest $request, int $id): Response
     {
         $job = Job::findOrFail($id);
-        $job->update($request->all());
+        $job->update($request->validated());
 
         return new Response($job, 200, [
             'Content-Type' => 'application/json',

@@ -2,9 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Enums\EmploymentType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\Models\Job;
+use App\Models\Company;
+use App\Models\User;
 
 class JobApiTest extends TestCase
 {
@@ -58,11 +61,12 @@ class JobApiTest extends TestCase
 
     public function test_store_job_succeeds(): void
     {
-        $this->withoutMiddleware();
+        $user = User::factory()->create();
+        $company = Company::factory()->create();
+        $user->companies()->attach($company->id, ['role' => 'owner']);
+        $jobData = Job::factory()->make(['company_id' => $company->id]);
 
-        $jobData = Job::factory()->make();
-
-        $response = $this->post('/api/jobs', $jobData->toArray());
+        $response = $this->actingAs($user)->postJson('/api/jobs', $jobData->toArray());
 
         $response->assertStatus(201);
         $response->assertHeader('Content-Type', 'application/json');
@@ -71,20 +75,28 @@ class JobApiTest extends TestCase
         $this->assertJson($content);
         $decoded = json_decode($content, true);
         $this->assertEquals($jobData->title, $decoded['title']);
+        $this->assertEquals($company->id, $decoded['company_id']);
         $this->assertDatabaseHas('jobs', [
             'title' => $jobData->title,
             'description' => $jobData->description,
+            'company_id' => $company->id,
         ]);
     }
 
     public function test_update_job_succeeds(): void
     {
-        $this->withoutMiddleware();
+        $user = User::factory()->create();
+        $company = Company::factory()->create();
+        $user->companies()->attach($company->id, ['role' => 'owner']);
 
-        $job = Job::factory()->create();
-        $updatedData = Job::factory()->make()->toArray();
+        $job = Job::factory()->create(['company_id' => $company->id]);
 
-        $response = $this->put('/api/jobs/' . $job->id, $updatedData);
+        $updatedData = [
+            'title' => 'Updated Job Title',
+            'department' => 'Updated Department',
+        ];
+
+        $response = $this->actingAs($user)->putJson('/api/jobs/' . $job->id, $updatedData);
 
         $response->assertStatus(200);
         $response->assertHeader('Content-Type', 'application/json');
@@ -96,6 +108,7 @@ class JobApiTest extends TestCase
         $this->assertDatabaseHas('jobs', [
             'id' => $job->id,
             'title' => $updatedData['title'],
+            'department' => $updatedData['department'],
         ]);
     }
 
@@ -158,5 +171,60 @@ class JobApiTest extends TestCase
         $timestamp2 = strtotime($decoded[2]['created_at']);
         $this->assertTrue($timestamp0 >= $timestamp1);
         $this->assertTrue($timestamp1 >= $timestamp2);
+    }
+
+    public function test_store_job_authorizes_company_owner(): void
+    {
+        $user = User::factory()->create();
+        $company = Company::factory()->create();
+
+        $user->companies()->attach($company->id, ['role' => 'owner']);
+
+        $jobData = [
+            'company_id' => $company->id,
+            'title' => 'Test Job',
+            'description' => 'Test Description',
+            'department' => 'IT',
+            'city' => 'Vienna',
+            'country' => 'Austria',
+            'application_email' => 'test@company.com',
+            'application_url' => 'https://company.com/apply',
+            'employment_type' => EmploymentType::FullTime->value,
+        ];
+
+        $response = $this->actingAs($user)->postJson('/api/jobs', $jobData);
+
+        $response->assertStatus(201);
+        $this->assertDatabaseHas('jobs', [
+            'title' => 'Test Job',
+            'company_id' => $company->id,
+        ]);
+    }
+
+    public function test_store_job_denies_non_company_owner(): void
+    {
+        $user = User::factory()->create();
+        $company = Company::factory()->create();
+
+        $user->companies()->attach($company->id, ['role' => 'employee']);
+
+        $jobData = [
+            'company_id' => $company->id,
+            'title' => 'Test Job',
+            'description' => 'Test Description',
+            'department' => 'IT',
+            'city' => 'Vienna',
+            'country' => 'Austria',
+            'application_email' => 'test@company.com',
+            'application_url' => 'https://company.com/apply',
+            'employment_type' => EmploymentType::FullTime->value,
+        ];
+
+        $response = $this->actingAs($user)->postJson('/api/jobs', $jobData);
+
+        $response->assertStatus(403);
+        $this->assertDatabaseMissing('jobs', [
+            'title' => 'Test Job',
+        ]);
     }
 }
