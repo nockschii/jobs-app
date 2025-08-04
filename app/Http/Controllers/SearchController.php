@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Job;
+use App\Services\Search\SearchService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -10,21 +10,12 @@ class SearchController extends Controller
 {
     public function search(Request $request): Response
     {
-        $searchterm = $request->get('searchterm');
+        $searchterm = (string) $request->get('searchterm', '');
 
-        if (empty($searchterm)) {
-            return new Response([], 200, [
-                'Content-Type' => 'application/json',
-            ]);
-        }
+        $searchService = new SearchService();
+        $results = $searchService->searchFlat($searchterm);
 
-        $jobs = Job::where('is_active', true)
-            ->where('title', 'LIKE', '%' . $searchterm . '%')
-            ->orWhere('city', 'LIKE', '%' . $searchterm . '%')
-            ->orWhere('country', 'LIKE', '%' . $searchterm . '%')
-            ->get();
-
-        return new Response($jobs, 200, [
+        return new Response($results->toArray(), 200, [
             'Content-Type' => 'application/json',
         ]);
     }
