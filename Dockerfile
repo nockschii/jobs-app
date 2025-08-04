@@ -15,6 +15,7 @@ RUN curl -sSLf \
     zip \
     exif  \
     redis \
+    xdebug \
     @composer
 
 # some useful extensions for the future, I dont want to google anymore
