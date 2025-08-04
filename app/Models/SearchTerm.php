@@ -18,6 +18,8 @@ class SearchTerm extends Model
         'user_agent',
         'session_id',
         'referer',
+        'platform',
+        'screen',
     ];
 
     protected $casts = [

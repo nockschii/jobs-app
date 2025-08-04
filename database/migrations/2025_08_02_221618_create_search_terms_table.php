@@ -21,6 +21,8 @@ return new class extends Migration
             $table->text('user_agent')->nullable();
             $table->string('session_id')->nullable();
             $table->string('referer')->nullable();
+            $table->string('platform')->nullable();
+            $table->string('screen')->nullable();
             $table->timestamps();
         });
     }

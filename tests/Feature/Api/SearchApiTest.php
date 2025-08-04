@@ -295,11 +295,16 @@ class SearchApiTest extends TestCase
 
         $searchTerm = 'Laravel';
 
+
         $response = $this->withHeaders([
             'User-Agent' => 'TestBrowser/1.0',
-            'Referer' => 'https://example.com'
+            'Referer' => 'https://example.com',
         ])->post('/api/search/store', [
-            'searchterm' => $searchTerm
+            'searchterm' => $searchTerm,
+            'userInfo' => [
+                'platform' => $user->platform,
+                'screen' => $user->screen,
+            ]
         ]);
 
         $response->assertStatus(201);
@@ -308,7 +313,9 @@ class SearchApiTest extends TestCase
             'results_count' => 1,
             'user_id' => $user->id,
             'user_agent' => 'TestBrowser/1.0',
-            'referer' => 'https://example.com'
+            'referer' => 'https://example.com',
+            'platform' => $user->platform,
+            'screen' => $user->screen,
         ]);
 
         $this->assertDatabaseCount('search_terms', 1);

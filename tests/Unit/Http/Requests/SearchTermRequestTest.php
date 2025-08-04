@@ -3,18 +3,18 @@
 namespace Tests\Unit\Requests;
 
 use Tests\TestCase;
-use App\Http\Requests\SearchTermRequest;
+use App\Http\Requests\SearchTermStoreRequest;
 use Illuminate\Support\Facades\Validator;
 
 class SearchTermRequestTest extends TestCase
 {
-    protected SearchTermRequest $request;
+    protected SearchTermStoreRequest $request;
     protected array $rules;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->request = new SearchTermRequest();
+        $this->request = new SearchTermStoreRequest();
         $this->rules = $this->request->rules();
     }
 

@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\SearchTermSearchRequest;
 use App\Services\Search\SearchService;
-use Illuminate\Http\Request;
-use App\Http\Requests\SearchTermRequest;
+use App\Http\Requests\SearchTermStoreRequest;
 use Illuminate\Http\JsonResponse;
 
 class SearchController extends Controller
 {
-    public function search(Request $request): JsonResponse
+    public function search(SearchTermSearchRequest $request): JsonResponse
     {
         $searchterm = (string) $request->get('searchterm', '');
         $searchService = new SearchService();
@@ -18,7 +18,7 @@ class SearchController extends Controller
         return response()->json($results->toArray());
     }
 
-    public function store(SearchTermRequest $request): JsonResponse
+    public function store(SearchTermStoreRequest $request): JsonResponse
     {
         $searchterm = $request->get('searchterm');
         $user = $request->user();
