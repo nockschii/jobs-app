@@ -2,6 +2,9 @@
   <div class="add-job-page">
     <div class="page-header">
       <h1>Neue Stellenausschreibung hinzufügen</h1>
+      <p class="form-legend">
+        <span class="required-indicator">*</span> Pflichtfelder
+      </p>
     </div>
     
     <div class="job-form">
@@ -10,103 +13,138 @@
           <h2>Stelleninformationen</h2>
           
           <div class="form-group">
-            <label for="title">Titel *</label>
+            <label for="title">
+              Titel <span class="required-indicator">*</span>
+            </label>
             <input 
               id="title"
               v-model="form.title" 
               type="text" 
               required 
               maxlength="120"
-              placeholder="z.B. Entwickler"
+              placeholder="z.B. PHP Entwickler"
+              :class="{ 'error': errors.title }"
             />
             <small class="field-hint">{{ form.title.length }}/120 Zeichen</small>
+            <div v-if="errors.title" class="error-text">{{ errors.title }}</div>
           </div>
           
           <div class="form-group">
-            <label for="description">Stellenbeschreibung</label>
+            <label for="description">
+              Stellenbeschreibung <span class="optional-text">(optional)</span>
+            </label>
             <textarea 
               id="description"
               v-model="form.description" 
               rows="5"
               placeholder="Beschreiben Sie detailliert die Hauptaufgaben, erforderlichen Qualifikationen und was das Unternehmen bietet. Zum Beispiel: Technologien, Arbeitsumgebung, Benefits, Entwicklungsmöglichkeiten..."
+              :class="{ 'error': errors.description }"
             ></textarea>
+            <small class="field-hint">{{ (form.description || '').length }} Zeichen</small>
+            <div v-if="errors.description" class="error-text">{{ errors.description }}</div>
           </div>
           
           <div class="form-row">
             <div class="form-group">
-              <label for="department">Abteilung *</label>
+              <label for="department">
+                Abteilung <span class="optional-text">(optional)</span>
+              </label>
               <input 
                 id="department"
                 v-model="form.department" 
                 type="text" 
-                required 
                 maxlength="50"
                 placeholder="z.B. IT & Softwareentwicklung"
+                :class="{ 'error': errors.department }"
               />
+              <small class="field-hint">{{ (form.department || '').length }}/50 Zeichen</small>
+              <div v-if="errors.department" class="error-text">{{ errors.department }}</div>
             </div>
             
             <div class="form-group">
-              <label for="employment_type">Beschäftigungsart</label>
-              <select id="employment_type" v-model="form.employment_type">
+              <label for="employment_type">
+                Beschäftigungsart <span class="optional-text">(optional)</span>
+              </label>
+              <select id="employment_type" v-model="form.employment_type" :class="{ 'error': errors.employment_type }">
                 <option value="">Beschäftigungsart auswählen</option>
-                <option value="full-time">Vollzeit</option>
-                <option value="part-time">Teilzeit</option>
-                <option value="contract">Befristet</option>
-                <option value="freelance">Freiberuflich</option>
-                <option value="internship">Praktikum</option>
+                <option 
+                  v-for="type in employmentTypes" 
+                  :key="type.value" 
+                  :value="type.value"
+                >
+                  {{ type.label }}
+                </option>
               </select>
+              <div v-if="errors.employment_type" class="error-text">{{ errors.employment_type }}</div>
             </div>
           </div>
           
           <div class="form-row">
             <div class="form-group">
-              <label for="city">Stadt *</label>
+              <label for="city">
+                Stadt <span class="optional-text">(optional)</span>
+              </label>
               <input 
                 id="city"
                 v-model="form.city" 
                 type="text" 
-                required 
                 maxlength="60"
                 placeholder="z.B. Wien, München, Zürich"
+                :class="{ 'error': errors.city }"
               />
+              <small class="field-hint">{{ (form.city || '').length }}/60 Zeichen</small>
+              <div v-if="errors.city" class="error-text">{{ errors.city }}</div>
             </div>
             
             <div class="form-group">
-              <label for="country">Land *</label>
+              <label for="country">
+                Land <span class="optional-text">(optional)</span>
+              </label>
               <input 
                 id="country"
                 v-model="form.country" 
                 type="text" 
-                required 
                 maxlength="60"
                 placeholder="z.B. Österreich, Deutschland, Schweiz"
+                :class="{ 'error': errors.country }"
               />
+              <small class="field-hint">{{ (form.country || '').length }}/60 Zeichen</small>
+              <div v-if="errors.country" class="error-text">{{ errors.country }}</div>
             </div>
           </div>
           
           <div class="form-row">
             <div class="form-group">
-              <label for="application_email">Bewerbungs-E-Mail *</label>
+              <label for="application_email">
+                Bewerbungs-E-Mail <span class="required-indicator">*</span>
+              </label>
               <input 
                 id="application_email"
                 v-model="form.application_email" 
                 type="email" 
-                required 
+                required
                 maxlength="255"
                 placeholder="z.B. bewerbung@unternehmen.at"
+                :class="{ 'error': errors.application_email }"
               />
+              <small class="field-hint">{{ (form.application_email || '').length }}/255 Zeichen</small>
+              <div v-if="errors.application_email" class="error-text">{{ errors.application_email }}</div>
             </div>
             
             <div class="form-group">
-              <label for="application_url">Bewerbungslink *</label>
+              <label for="application_url">
+                Bewerbungslink <span class="optional-text">(optional)</span>
+              </label>
               <input 
                 id="application_url"
                 v-model="form.application_url" 
                 type="url" 
-                required 
-                maxlength="500"
+                maxlength="200"
                 placeholder="z.B. https://unternehmen.at/karriere/stellenausschreibung"
+                :class="{ 'error': errors.application_url }"
               />
+              <small class="field-hint">{{ (form.application_url || '').length }}/200 Zeichen</small>
+              <div v-if="errors.application_url" class="error-text">{{ errors.application_url }}</div>
             </div>
           </div>
         </div>
@@ -115,8 +153,10 @@
           <h2>Unternehmensinformationen</h2>
           
           <div class="form-group">
-            <label for="company">Unternehmen *</label>
-            <select id="company" v-model="form.company_id" required>
+            <label for="company">
+              Unternehmen <span class="required-indicator">*</span>
+            </label>
+            <select id="company" v-model="form.company_id" required :class="{ 'error': errors.company_id }">
               <option value="">Unternehmen auswählen</option>
               <option 
                 v-for="company in companies" 
@@ -126,6 +166,35 @@
                 {{ company.name }}
               </option>
             </select>
+            <div v-if="errors.company_id" class="error-text">{{ errors.company_id }}</div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h2>Status & Sichtbarkeit</h2>
+          
+          <div class="form-row">
+            <div class="form-group checkbox-form-group">
+
+              <div class="checkbox-group">
+                <input 
+                  id="is_active"
+                  v-model="form.is_active"
+                  type="checkbox"
+                />
+                <label for="is_active" class="checkbox-label">
+                  Stellenausschreibung aktiv schalten
+                </label>
+              </div>
+              <small class="field-hint">
+                Aktive Stellenausschreibungen werden öffentlich angezeigt und können von Bewerbern gefunden werden.
+              </small>
+              <div v-if="errors.is_active" class="error-text">{{ errors.is_active }}</div>
+            </div>
+            
+            <div class="form-group">
+              <!-- Platzhalter für zusätzliche Felder -->
+            </div>
           </div>
         </div>
         
@@ -137,7 +206,7 @@
             Abbrechen
           </a>
           <button type="submit" class="btn-submit" :disabled="loading">
-            {{ loading ? 'Erstelle...' : 'Stelle erstellen' }}
+            {{ loading ? 'Erstelle...' : 'Stellenausschreibung erstellen' }}
           </button>
         </div>
       </form>
@@ -160,7 +229,17 @@ export default {
     return {
       loading: false,
       error: '',
+      errors: {},
       companies: [],
+      employmentTypes: [
+        { value: 'Vollzeit', label: 'Vollzeit' },
+        { value: 'Teilzeit', label: 'Teilzeit' },
+        { value: 'Vertrag', label: 'Vertrag' },
+        { value: 'Praktikum', label: 'Praktikum' },
+        { value: 'Befristet', label: 'Befristet' },
+        { value: 'Freiwillig', label: 'Freiwillig' },
+        { value: 'Freelance', label: 'Freelance' }
+      ],
       form: {
         title: '',
         description: '',
@@ -170,7 +249,8 @@ export default {
         application_email: '',
         application_url: '',
         employment_type: '',
-        company_id: ''
+        company_id: '',
+        is_active: false
       }
     }
   },
@@ -187,24 +267,94 @@ export default {
       }
     },
     
+    validateForm() {
+      this.errors = {};
+      
+      // Titel validieren (Pflichtfeld, max 120 Zeichen)
+      if (!this.form.title || this.form.title.trim().length === 0) {
+        this.errors.title = 'Titel ist erforderlich';
+      } else if (this.form.title.length > 120) {
+        this.errors.title = 'Titel darf maximal 120 Zeichen lang sein';
+      }
+      
+      // Bewerbungs-E-Mail validieren (Pflichtfeld, max 255 Zeichen)
+      if (!this.form.application_email || this.form.application_email.trim().length === 0) {
+        this.errors.application_email = 'Bewerbungs-E-Mail ist erforderlich';
+      } else if (this.form.application_email.length > 255) {
+        this.errors.application_email = 'E-Mail darf maximal 255 Zeichen lang sein';
+      } else {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(this.form.application_email)) {
+          this.errors.application_email = 'Bitte geben Sie eine gültige E-Mail-Adresse ein';
+        }
+      }
+      
+      // Unternehmen validieren (Pflichtfeld)
+      if (!this.form.company_id) {
+        this.errors.company_id = 'Bitte wählen Sie ein Unternehmen aus';
+      }
+      
+      // Optionale Felder validieren (nur Länge prüfen, falls ausgefüllt)
+      if (this.form.department && this.form.department.length > 50) {
+        this.errors.department = 'Abteilung darf maximal 50 Zeichen lang sein';
+      }
+      
+      if (this.form.city && this.form.city.length > 60) {
+        this.errors.city = 'Stadt darf maximal 60 Zeichen lang sein';
+      }
+      
+      if (this.form.country && this.form.country.length > 60) {
+        this.errors.country = 'Land darf maximal 60 Zeichen lang sein';
+      }
+      
+      if (this.form.application_url && this.form.application_url.length > 200) {
+        this.errors.application_url = 'URL darf maximal 200 Zeichen lang sein';
+      }
+      
+      // URL validieren (falls angegeben)
+      if (this.form.application_url) {
+        try {
+          new URL(this.form.application_url);
+        } catch {
+          this.errors.application_url = 'Bitte geben Sie eine gültige URL ein';
+        }
+      }
+      
+      return Object.keys(this.errors).length === 0;
+    },
+    
     async handleSubmit() {
+      if (!this.validateForm()) {
+        this.error = 'Bitte korrigieren Sie die Fehler in den markierten Feldern';
+        return;
+      }
+      
       this.loading = true;
       this.error = '';
       
       try {
         const jobData = { ...this.form };
+        
         // Leere Strings in null konvertieren für nullable Felder
-        if (!jobData.description) jobData.description = null;
-        if (!jobData.employment_type) jobData.employment_type = null;
+        const nullableFields = ['description', 'department', 'city', 'country', 'application_url', 'employment_type'];
+        nullableFields.forEach(field => {
+          if (!jobData[field] || (typeof jobData[field] === 'string' && jobData[field].trim() === '')) {
+            jobData[field] = null;
+          }
+        });
         
         const response = await createJob(jobData);
+        this.$emit('job-created', response.data);
         // Erfolgreiche Erstellung - zur Startseite weiterleiten
         window.location.href = '/';
       } catch (error) {
         if (error.response?.status === 422) {
+          // Validierungsfehler vom Server
+          const serverErrors = error.response.data.errors || {};
+          this.errors = { ...this.errors, ...serverErrors };
           this.error = 'Bitte überprüfen Sie Ihre Eingabedaten';
         } else {
-          this.error = error.response?.data?.message || 'Fehler beim Erstellen der Stelle';
+          this.error = error.response?.data?.message || 'Fehler beim Erstellen der Stellenausschreibung';
         }
       } finally {
         this.loading = false;
@@ -213,16 +363,18 @@ export default {
     
     loadExample() {
       this.form = {
-        title: 'Test Job',
-        description: 'Wir brauchen einen Test Job für die Anwendung."',
-        department: 'IT & Softwareentwicklung',
+        title: 'TestJob Bezeichnung#1 - Bezeichnung_2',
+        description: 'Wir brauchen diesen Testjob zum Testen',
+        department: 'Softwaretesting',
         city: 'Wien',
         country: 'Österreich',
         application_email: 'bewerbung@tech-firma.at',
-        application_url: 'https://tech-firma.at/karriere/test-job',
+        application_url: 'https://tech-firma.at/karriere/frontend-entwickler',
         employment_type: 'Vollzeit',
-        company_id: this.companies.length > 0 ? this.companies[0].id : ''
+        company_id: this.companies.length > 0 ? this.companies[0].id : '',
+        is_active: true
       };
+      this.errors = {}; // Fehler zurücksetzen
     }
   }
 }
@@ -230,7 +382,7 @@ export default {
 
 <style scoped>
 .add-job-page {
-  max-width: 800px;
+  max-width: 900px;
   margin: 0 auto;
   padding: 2rem;
 }
@@ -242,7 +394,24 @@ export default {
 .page-header h1 {
   color: #333;
   font-size: 2rem;
+  margin: 0 0 0.5rem 0;
+}
+
+.form-legend {
+  color: #6b7280;
+  font-size: 0.9rem;
   margin: 0;
+}
+
+.required-indicator {
+  color: #dc2626;
+  font-weight: bold;
+}
+
+.optional-text {
+  color: #6b7280;
+  font-weight: normal;
+  font-size: 0.9rem;
 }
 
 .job-form {
@@ -250,6 +419,7 @@ export default {
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .form-section {
@@ -259,19 +429,19 @@ export default {
 .form-section h2 {
   color: #555;
   font-size: 1.25rem;
-  margin-bottom: 1rem;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #f3f4f6;
+  padding-bottom: 0.75rem;
 }
 
 .form-group {
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  gap: 1.5rem;
 }
 
 .form-group label {
@@ -285,7 +455,7 @@ export default {
   font-size: 0.75rem;
   color: #6b7280;
   margin-top: 0.25rem;
-  display: block;
+  white-space: nowrap;
 }
 
 .form-group input,
@@ -293,9 +463,10 @@ export default {
 .form-group textarea {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
   font-size: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .form-group input:focus,
@@ -303,12 +474,25 @@ export default {
 .form-group textarea:focus {
   outline: none;
   border-color: #4f46e5;
-  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.form-group input.error,
+.form-group select.error,
+.form-group textarea.error {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+.error-text {
+  color: #dc2626;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
 }
 
 .form-group textarea {
   resize: vertical;
-  min-height: 100px;
+  min-height: 120px;
 }
 
 .form-actions {
@@ -317,7 +501,7 @@ export default {
   justify-content: flex-end;
   margin-top: 2rem;
   padding-top: 2rem;
-  border-top: 1px solid #eee;
+  border-top: 1px solid #e5e7eb;
 }
 
 .btn-example {
@@ -325,7 +509,7 @@ export default {
   background: #10b981;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   font-weight: 500;
   cursor: pointer;
   transition: background-color 0.2s;
@@ -342,7 +526,7 @@ export default {
 .btn-submit {
   padding: 0.75rem 1.5rem;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   font-weight: 500;
   cursor: pointer;
   transition: background-color 0.2s;
@@ -379,8 +563,37 @@ export default {
   color: #dc2626;
   padding: 1rem;
   border: 1px solid #fecaca;
-  border-radius: 4px;
+  border-radius: 6px;
   margin-top: 1rem;
+}
+
+.checkbox-form-group .main-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.checkbox-label {
+  margin-bottom: 0 !important;
+  font-weight: 500;
+  cursor: pointer;
+  line-height: 1.4;
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: auto;
+  margin: 0;
+  margin-top: 0.1rem;
+  transform: scale(1.1);
+  flex-shrink: 0;
 }
 
 @media (max-width: 768px) {
@@ -390,6 +603,7 @@ export default {
   
   .form-row {
     grid-template-columns: 1fr;
+    gap: 1rem;
   }
   
   .form-actions {
