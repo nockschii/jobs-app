@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use App\Enums\Role;
 
 return new class extends Migration
 {
@@ -12,10 +13,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('user_companies', function (Blueprint $table) {
+            $roles = array_map(fn($role) => $role->value, Role::cases());
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('company_id')->constrained('companies')->onDelete('cascade');
-            $table->string('role', 50)->default('employee');
+            $table->enum('role', $roles)->default('employee');
             $table->timestamp('joined_at')->useCurrent();
             $table->timestamp('left_at')->nullable();
             $table->string('status', 20)->default('active');
@@ -31,3 +33,4 @@ return new class extends Migration
         Schema::dropIfExists('user_companies');
     }
 };
+    

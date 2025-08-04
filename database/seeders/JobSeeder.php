@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\EmploymentType;
 use App\Models\Job;
 use App\Models\Company;
 use Illuminate\Database\Seeder;
@@ -123,7 +124,7 @@ class JobSeeder extends Seeder
         ];
 
         $departments = ['Entwicklung', 'Marketing', 'Vertrieb', 'Personalwesen', 'Finanzen', 'Operations', 'Recht', 'Design'];
-        $employmentType = ['Vollzeit (38,5h)', 'Vollzeit (40h)', 'Teilzeit (20h)', 'Teilzeit (32h)', 'Befristet'];
+        $employmentType = array_map(fn($type) => $type->value, EmploymentType::cases());
 
         if ($companies->isNotEmpty()) {
             for ($i = 0; $i < 50; $i++) {

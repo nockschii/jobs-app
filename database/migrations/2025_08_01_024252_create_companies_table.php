@@ -15,16 +15,16 @@ return new class extends Migration
             $table->id();
             $table->string('name', 100);
             $table->string('email', 255);
-            $table->text('description');
-            $table->string('address', 200);
-            $table->string('city', 60);
-            $table->string('country', 60);
-            $table->string('postal_code', 20);
-            $table->string('phone', 20);
-            $table->string('website', 255);
-            $table->string('linkedin_url', 255);
-            $table->string('industry', 50);
-            $table->string('logo', 255);
+            $table->text('description')->nullable();
+            $table->string('address', 200)->nullable();
+            $table->string('city', 60)->nullable();
+            $table->string('country', 60)->nullable();
+            $table->string('postal_code', 20)->nullable();
+            $table->string('phone', 20)->nullable();
+            $table->string('website', 255)->nullable();
+            $table->string('linkedin_url', 255)->nullable();
+            $table->string('industry', 50)->nullable();
+            $table->string('logo', 255)->nullable();
             $table->timestamps();
         });
 
