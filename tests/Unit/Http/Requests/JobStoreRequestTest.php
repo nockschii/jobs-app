@@ -16,11 +16,15 @@ class JobStoreRequestTest extends TestCase
     use RefreshDatabase;
 
     private Company $company;
+    private JobStoreRequest $request;
+    private array $rules;
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->company = Company::factory()->create();
+        $this->request = new JobStoreRequest();
+        $this->rules = $this->request->rules();
     }
 
     protected function tearDown(): void
@@ -31,10 +35,7 @@ class JobStoreRequestTest extends TestCase
 
     public function test_validates_required_fields(): void
     {
-        $request = new JobStoreRequest();
-        $rules = $request->rules();
-
-        $validator = Validator::make([], $rules);
+        $validator = Validator::make([], $this->rules);
 
         $this->assertTrue($validator->fails());
         $this->assertArrayHasKey('company_id', $validator->errors()->toArray());
@@ -48,9 +49,6 @@ class JobStoreRequestTest extends TestCase
 
     public function test_validates_field_max_lengths(): void
     {
-        $request = new JobStoreRequest();
-        $rules = $request->rules();
-
         $data = [
             'company_id' => $this->company->id,
             'title' => str_repeat('x', 121),
@@ -62,7 +60,7 @@ class JobStoreRequestTest extends TestCase
             'employment_type' => str_repeat('x', 21),
         ];
 
-        $validator = Validator::make($data, $rules);
+        $validator = Validator::make($data, $this->rules);
 
         $this->assertTrue($validator->fails());
         $this->assertArrayHasKey('title', $validator->errors()->toArray());
@@ -76,9 +74,6 @@ class JobStoreRequestTest extends TestCase
 
     public function test_validates_boundary_values_successfully(): void
     {
-        $request = new JobStoreRequest();
-        $rules = $request->rules();
-
         $data = [
             'company_id' => $this->company->id,
             'title' => 'Valid Title',
@@ -90,16 +85,13 @@ class JobStoreRequestTest extends TestCase
             'employment_type' => EmploymentType::FullTime->value,
         ];
 
-        $validator = Validator::make($data, $rules);
+        $validator = Validator::make($data, $this->rules);
 
         $this->assertFalse($validator->fails());
     }
 
     public function test_validates_email_format(): void
     {
-        $request = new JobStoreRequest();
-        $rules = $request->rules();
-
         $invalidEmails = [
             'invalid-email',
             'test@',
@@ -112,7 +104,7 @@ class JobStoreRequestTest extends TestCase
             $data = $this->makeValidJobData();
             $data['application_email'] = $invalidEmail;
 
-            $validator = Validator::make($data, $rules);
+            $validator = Validator::make($data, $this->rules);
 
             $this->assertTrue($validator->fails(), "Email '{$invalidEmail}' should be invalid");
             $this->assertArrayHasKey('application_email', $validator->errors()->toArray());
@@ -121,9 +113,6 @@ class JobStoreRequestTest extends TestCase
 
     public function test_validates_url_format(): void
     {
-        $request = new JobStoreRequest();
-        $rules = $request->rules();
-
         $invalidUrls = [
             'not-a-url',
             'just-text',
@@ -135,7 +124,7 @@ class JobStoreRequestTest extends TestCase
             $data = $this->makeValidJobData();
             $data['application_url'] = $invalidUrl;
 
-            $validator = Validator::make($data, $rules);
+            $validator = Validator::make($data, $this->rules);
 
             $this->assertTrue($validator->fails());
             $this->assertArrayHasKey('application_url', $validator->errors()->toArray());
@@ -144,9 +133,6 @@ class JobStoreRequestTest extends TestCase
 
     public function test_validates_employment_type_enum(): void
     {
-        $request = new JobStoreRequest();
-        $rules = $request->rules();
-
         $invalidTypes = [
             'invalid_type',
             'permanent',
@@ -161,7 +147,7 @@ class JobStoreRequestTest extends TestCase
             $data = $this->makeValidJobData();
             $data['employment_type'] = $invalidType;
 
-            $validator = Validator::make($data, $rules);
+            $validator = Validator::make($data, $this->rules);
 
             $this->assertTrue($validator->fails(), "Employment type '{$invalidType}' should be invalid");
             $this->assertArrayHasKey('employment_type', $validator->errors()->toArray());
@@ -170,16 +156,13 @@ class JobStoreRequestTest extends TestCase
 
     public function test_accepts_valid_employment_types(): void
     {
-        $request = new JobStoreRequest();
-        $rules = $request->rules();
-
         $validTypes = array_map(fn($type) => $type->value, EmploymentType::cases());
 
         foreach ($validTypes as $type) {
             $data = $this->makeValidJobData();
             $data['employment_type'] = $type;
 
-            $validator = Validator::make($data, $rules);
+            $validator = Validator::make($data, $this->rules);
 
             $this->assertFalse($validator->fails(), "Employment type '{$type}' should be valid");
         }
@@ -187,9 +170,6 @@ class JobStoreRequestTest extends TestCase
 
     public function test_allows_nullable_fields(): void
     {
-        $request = new JobStoreRequest();
-        $rules = $request->rules();
-
         $data = [
             'company_id' => $this->company->id,
             'title' => 'Valid Title',
@@ -200,16 +180,13 @@ class JobStoreRequestTest extends TestCase
             'application_url' => 'https://valid-url.com',
         ];
 
-        $validator = Validator::make($data, $rules);
+        $validator = Validator::make($data, $this->rules);
 
         $this->assertFalse($validator->fails());
     }
 
     public function test_validates_string_types(): void
     {
-        $request = new JobStoreRequest();
-        $rules = $request->rules();
-
         $data = [
             'company_id' => $this->company->id,
             'title' => 123,
@@ -220,7 +197,7 @@ class JobStoreRequestTest extends TestCase
             'application_url' => 'https://valid-url.com',
         ];
 
-        $validator = Validator::make($data, $rules);
+        $validator = Validator::make($data, $this->rules);
 
         $this->assertTrue($validator->fails());
         $this->assertArrayHasKey('title', $validator->errors()->toArray());
@@ -231,12 +208,9 @@ class JobStoreRequestTest extends TestCase
 
     public function test_passes_validation_with_valid_data(): void
     {
-        $request = new JobStoreRequest();
-        $rules = $request->rules();
-
         $data = $this->makeValidJobData();
 
-        $validator = Validator::make($data, $rules);
+        $validator = Validator::make($data, $this->rules);
 
         $this->assertFalse($validator->fails());
 
@@ -248,9 +222,6 @@ class JobStoreRequestTest extends TestCase
 
     public function test_handles_empty_strings_vs_null(): void
     {
-        $request = new JobStoreRequest();
-        $rules = $request->rules();
-
         $data = [
             'company_id' => $this->company->id,
             'title' => '',
@@ -263,7 +234,7 @@ class JobStoreRequestTest extends TestCase
             'employment_type' => '',
         ];
 
-        $validator = Validator::make($data, $rules);
+        $validator = Validator::make($data, $this->rules);
 
         $this->assertTrue($validator->fails());
         $this->assertArrayHasKey('title', $validator->errors()->toArray());
@@ -271,9 +242,6 @@ class JobStoreRequestTest extends TestCase
 
     public function test_validates_company_id_exists(): void
     {
-        $request = new JobStoreRequest();
-        $rules = $request->rules();
-
         $data = [
             'company_id' => 99999,
             'title' => 'Valid Title',
@@ -285,7 +253,7 @@ class JobStoreRequestTest extends TestCase
             'employment_type' => EmploymentType::FullTime->value,
         ];
 
-        $validator = Validator::make($data, $rules);
+        $validator = Validator::make($data, $this->rules);
 
         $this->assertTrue($validator->fails());
         $this->assertArrayHasKey('company_id', $validator->errors()->toArray());

@@ -26,7 +26,7 @@ class SearchApiTest extends TestCase
 
         $response = $this->get('/api/search');
         $response->assertStatus(200);
-        
+
         $content = json_decode($response->getContent(), true);
         $this->assertCount(2, $content);
     }
@@ -222,7 +222,7 @@ class SearchApiTest extends TestCase
         ]);
         Job::factory()->create([
             'company_id' => $company->id,
-            'title' => 'Senior Developer'  
+            'title' => 'PHP Developer'
         ]);
 
         $response = $this->get('/api/search?searchterm=Developer');
@@ -244,6 +244,90 @@ class SearchApiTest extends TestCase
 
         $jobTitles = array_column($content, 'title');
         $this->assertContains('Developer', $jobTitles);
-        $this->assertContains('Senior Developer', $jobTitles);
+        $this->assertContains('PHP Developer', $jobTitles);
+    }
+
+    public function test_store_search_term_successfully_stores_and_returns_correct_response(): void
+    {
+        $user = \App\Models\User::factory()->create();
+        // Ohne 'api' guard - nur mit normalem actingAs
+        $this->actingAs($user);
+
+        $company = Company::factory()->create();
+        Job::factory()->count(3)->create([
+            'company_id' => $company->id,
+            'title' => 'PHP Developer',
+            'is_active' => true
+        ]);
+
+        $searchTerm = 'PHP Developer';
+
+        $response = $this->post('/api/search/store', [
+            'searchterm' => $searchTerm
+        ]);
+
+        $response->assertStatus(201);
+        $response->assertHeader('Content-Type', 'application/json');
+
+        $content = json_decode($response->getContent(), true);
+        $this->assertEquals('Search term stored successfully', $content['message']);
+        $this->assertArrayHasKey('id', $content);
+
+        $this->assertDatabaseHas('search_terms', [
+            'term' => $searchTerm,
+            'results_count' => 3,
+            'user_id' => $user->id
+        ]);
+    }
+
+    public function test_store_search_term_with_authenticated_user_stores_user_id(): void
+    {
+        $user = \App\Models\User::factory()->create([
+            'email' => 'testuser@example.com'
+        ]);
+        $this->actingAs($user);
+        $company = Company::factory()->create();
+        Job::factory()->create([
+            'company_id' => $company->id,
+            'title' => 'Laravel Developer',
+            'is_active' => true
+        ]);
+
+        $searchTerm = 'Laravel';
+
+        $response = $this->withHeaders([
+            'User-Agent' => 'TestBrowser/1.0',
+            'Referer' => 'https://example.com'
+        ])->post('/api/search/store', [
+            'searchterm' => $searchTerm
+        ]);
+
+        $response->assertStatus(201);
+        $this->assertDatabaseHas('search_terms', [
+            'term' => $searchTerm,
+            'results_count' => 1,
+            'user_id' => $user->id,
+            'user_agent' => 'TestBrowser/1.0',
+            'referer' => 'https://example.com'
+        ]);
+
+        $this->assertDatabaseCount('search_terms', 1);
+    }
+
+    public function test_store_search_term_fails_with_empty_searchterm(): void
+    {
+        $response = $this->post('/api/search/store', [
+            'searchterm' => ''
+        ]);
+
+        $response->assertStatus(400);
+        $response->assertHeader('Content-Type', 'application/json');
+
+        $content = json_decode($response->getContent(), true);
+        $this->assertArrayHasKey('error', $content);
+        $this->assertEquals('Validation failed', $content['error']);
+        $this->assertArrayHasKey('messages', $content);
+
+        $this->assertDatabaseCount('search_terms', 0);
     }
 }

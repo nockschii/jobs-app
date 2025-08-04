@@ -18,6 +18,7 @@ Route::get('/jobs/{id}', [JobController::class, 'show'])->name('api.jobs.show');
 Route::get('/companies', [CompanyController::class, 'index'])->name('api.companies');
 Route::get('/companies/{id}', [CompanyController::class, 'show'])->name('api.companies.show');
 Route::get('/search', [SearchController::class, 'search'])->name('api.search');
+Route::post('/search/store', [SearchController::class, 'store'])->name('api.search.store');
 
 // Protected routes (authentication required)
 Route::middleware(['web', 'auth:sanctum'])->group(function () {

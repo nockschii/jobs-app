@@ -2,9 +2,11 @@
 
 namespace App\Services\Search;
 
+use App\Models\SearchTerm;
 use App\Services\Search\BasicSearchAlgorithm;
 use App\Services\Search\ExactMatchAlgorithm;
 use Illuminate\Support\Collection;
+use App\Models\User;
 
 class SearchService
 {
@@ -61,5 +63,20 @@ class SearchService
         });
 
         return $flatResults;
+    }
+
+    public function storeSearchTerm(string $searchterm, ?User $user, array $userInfo): SearchTerm
+    {
+        $resultsCount = $this->searchFlat($searchterm)->count();
+
+        return SearchTerm::create([
+            'term' => $searchterm,
+            'results_count' => $resultsCount,
+            'user_id' => $user ? $user->id : null,
+            'ip_address' => $userInfo['ip_address'] ?? request()->ip(),
+            'user_agent' => $userInfo['user_agent'] ?? request()->header('User-Agent'),
+            'session_id' => $userInfo['session_id'] ?? session()->getId(),
+            'referer' => $userInfo['referer'] ?? request()->header('Referer'),
+        ]);
     }
 }
