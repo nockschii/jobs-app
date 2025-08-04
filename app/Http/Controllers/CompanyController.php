@@ -2,49 +2,47 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use App\Models\Company;
+use Illuminate\Http\JsonResponse;
+use App\Http\Requests\CompanyStoreRequest;
+use App\Http\Requests\CompanyUpdateRequest;
 
 class CompanyController extends Controller
 {
-    public function index(): Response
+    public function index(): JsonResponse
     {
         $companies = Company::all();
-        return new Response($companies, 200, [
-            'Content-Type' => 'application/json',
-        ]);
+
+        return response()->json($companies);
     }
 
-    public function show(int $id): Response
+    public function show(int $id): JsonResponse
     {
         $company = Company::findOrFail($id);
-        return new Response($company, 200, [
-            'Content-Type' => 'application/json',
-        ]);
+
+        return response()->json($company);
     }
 
-    public function store(Request $request): Response
+    public function store(CompanyStoreRequest $request): JsonResponse
     {
-        $company = Company::create($request->all());
-        return new Response($company, 201, [
-            'Content-Type' => 'application/json',
-        ]);
+        $company = Company::create($request->validated());
+
+        return response()->json($company, 201);
     }
 
-    public function update(Request $request, int $id): Response
+    public function update(CompanyUpdateRequest $request, int $id): JsonResponse
     {
         $company = Company::findOrFail($id);
-        $company->update($request->all());
-        return new Response($company, 200, [
-            'Content-Type' => 'application/json',
-        ]);
+        $company->update($request->validated());
+
+        return response()->json($company);
     }
 
-    public function destroy(int $id): Response
+    public function destroy(int $id): JsonResponse
     {
         $company = Company::findOrFail($id);
         $company->delete();
-        return new Response(null, 204);
+
+        return response()->json(null, 204);
     }
 }

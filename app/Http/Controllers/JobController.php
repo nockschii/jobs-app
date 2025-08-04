@@ -3,58 +3,50 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use App\Models\Job;
 use App\Http\Requests\JobStoreRequest;
 use App\Http\Requests\JobUpdateRequest;
+use Illuminate\Http\JsonResponse;
 
 class JobController extends Controller
 {
-    public function index(): Response
+    public function index(): JsonResponse
     {
         $jobs = Job::with('company')
             ->where('is_active', true)
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return new Response($jobs, 200, [
-            'Content-Type' => 'application/json',
-        ]);
+        return response()->json($jobs);
     }
 
-    public function show(int $id): Response
+    public function show(int $id): JsonResponse
     {
         $job = Job::with('company')->findOrFail($id);
 
-        return new Response($job, 200, [
-            'Content-Type' => 'application/json',
-        ]);
+        return response()->json($job);
     }
 
-    public function store(JobStoreRequest $request): Response
+    public function store(JobStoreRequest $request): JsonResponse
     {
         $job = Job::create($request->validated());
 
-        return new Response($job, 201, [
-            'Content-Type' => 'application/json',
-        ]);
+        return response()->json($job, 201);
     }
 
-    public function update(JobUpdateRequest $request, int $id): Response
+    public function update(JobUpdateRequest $request, int $id): JsonResponse
     {
         $job = Job::findOrFail($id);
         $job->update($request->validated());
 
-        return new Response($job, 200, [
-            'Content-Type' => 'application/json',
-        ]);
+        return response()->json($job);
     }
 
-    public function destroy(int $id): Response
+    public function destroy(int $id): JsonResponse
     {
         $job = Job::findOrFail($id);
         $job->delete();
 
-        return new Response(null, 204);
+        return response()->json(null, 204);
     }
 }

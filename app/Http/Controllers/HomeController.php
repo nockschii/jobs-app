@@ -11,7 +11,7 @@ class HomeController extends Controller
         return view('welcome');
     }
 
-    public function create()
+    public function create(): View
     {
         return view('jobs.create');
     }
