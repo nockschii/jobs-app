@@ -13,11 +13,16 @@ class AuthenticationController extends Controller
     public function store(LoginRequest $request): JsonResponse
     {
         $request->authenticate();
-        $request->session()->regenerate();
+
+        if ($request->hasSession()) {
+            $request->session()->regenerate();
+        }
+
+        $user = Auth::user() ?: \App\Models\User::where('email', $request->input('email'))->first();
 
         return response()->json([
             'message' => 'Authenticated successfully',
-            'user' => $request->user()
+            'user' => $user
         ]);
     }
 
@@ -29,8 +34,11 @@ class AuthenticationController extends Controller
     public function destroy(Request $request): JsonResponse
     {
         Auth::guard('web')->logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+
+        if ($request->hasSession()) {
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        }
 
         return response()->json(['message' => 'Logged out successfully']);
     }

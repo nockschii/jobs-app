@@ -6,12 +6,7 @@ use App\Http\Controllers\JobController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\Auth\AuthenticationController;
 
-// Authentication routes (need session middleware)
-Route::middleware(['web'])->group(function () {
-    Route::post('/login', [AuthenticationController::class, 'store']);
-});
-
-// Public routes (no authentication required)
+Route::post('/login', [AuthenticationController::class, 'store']);
 Route::get('/jobs', [JobController::class, 'index'])->name('api.jobs');
 Route::get('/jobs/{id}', [JobController::class, 'show'])->name('api.jobs.show');
 Route::get('/companies', [CompanyController::class, 'index'])->name('api.companies');
@@ -19,8 +14,7 @@ Route::get('/companies/{id}', [CompanyController::class, 'show'])->name('api.com
 Route::get('/search', [SearchController::class, 'search'])->name('api.search');
 Route::post('/search/store', [SearchController::class, 'store'])->name('api.search.store');
 
-// Protected routes (authentication required)
-Route::middleware(['web', 'auth:sanctum'])->group(function () {
+Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/user', [AuthenticationController::class, 'user']);
 
     Route::post('/logout', [AuthenticationController::class, 'destroy']);
