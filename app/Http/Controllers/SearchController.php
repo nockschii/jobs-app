@@ -6,14 +6,17 @@ use App\Http\Requests\SearchTermSearchRequest;
 use App\Services\Search\SearchService;
 use App\Http\Requests\SearchTermStoreRequest;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
+
 
 class SearchController extends Controller
 {
+    public function __construct(private SearchService $searchService) {}
+
     public function search(SearchTermSearchRequest $request): JsonResponse
     {
         $searchterm = (string) $request->get('searchterm', '');
-        $searchService = new SearchService();
-        $results = $searchService->searchFlat($searchterm);
+        $results = $this->searchService->searchFlat($searchterm);
 
         return response()->json($results->toArray());
     }
@@ -24,10 +27,9 @@ class SearchController extends Controller
         $user = $request->user();
         $userInfo = $request->get('userInfo', []);
 
-        $searchService = new SearchService();
-        $storedSearchTerm = $searchService->storeSearchTerm(
+        $storedSearchTerm = $this->searchService->storeSearchTerm(
             $searchterm,
-            $user ? $user : null,
+            $request->user() ? $request->user() : null,
             $userInfo
         );
 
