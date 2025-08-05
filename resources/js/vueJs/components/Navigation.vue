@@ -1,5 +1,5 @@
 <template>
-  <nav class="navigation">
+  <nav class="navigation bg-gray-800 text-white">
     <div class="nav-brand">
       <a href="/">Job Board</a>
     </div>
@@ -8,14 +8,13 @@
         <button class="menu-btn" @click="toggleMenu">
           Menu ▼
         </button>
-        <div class="dropdown" v-show="showMenu" @click.stop>
+        <div class="dropdown bg-gray-800 text-white" v-show="showMenu" @click.stop>
           <a href="/jobs/create">Add Job</a>
           <a href="#" @click="showMenu = false">My Jobs</a>
           <a href="#" @click="showMenu = false">My Companies</a>
         </div>
       </div>
-      
-      <!-- Show different content based on login status -->
+
       <div v-if="user" class="user-info">
         <span class="welcome-text">Hi, {{ user.name }}!</span>
         <button class="logout-btn" @click="handleLogout">Logout</button>
@@ -86,20 +85,19 @@ export default {
   padding: 0.5rem 1rem;
   border: 1px solid #ccc;
   border-radius: 4px;
-  background: white;
   cursor: pointer;
   font-weight: 500;
 }
 
 .menu-btn:hover {
-  background: #f5f5f5;
+  background: #DBEAFE;
+  color: black;
 }
 
 .dropdown {
   position: absolute;
   top: 100%;
   right: 0;
-  background: white;
   border: 1px solid #ccc;
   border-radius: 4px;
   min-width: 150px;
@@ -115,7 +113,8 @@ export default {
 }
 
 .dropdown a:hover {
-  background: #f5f5f5;
+  background: #DBEAFE;
+  color: black;
 }
 
 .user-info {
@@ -125,11 +124,12 @@ export default {
 }
 
 .welcome-text {
-  color: #333;
+  color: white;
   font-weight: 500;
 }
 
-.login-btn, .logout-btn {
+.login-btn,
+.logout-btn {
   padding: 0.5rem 1rem;
   border: none;
   border-radius: 4px;

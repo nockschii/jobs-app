@@ -1,28 +1,22 @@
 <template>
-  <!-- Modal Overlay -->
   <div v-if="show" class="modal-overlay" @click="closeModal">
     <div class="modal-content" @click.stop>
-      <!-- Modal Header -->
       <div class="modal-header">
         <h2>Login</h2>
         <button @click="closeModal" class="close-btn">&times;</button>
       </div>
 
-      <!-- Login Form -->
       <form @submit.prevent="handleSubmit">
-        <!-- Email -->
         <div class="form-group">
           <label for="email">Email</label>
           <input id="email" type="email" required v-model="form.email" placeholder="Email address">
         </div>
 
-        <!-- Password -->
         <div class="form-group">
           <label for="password">Password</label>
           <input id="password" type="password" required v-model="form.password" placeholder="Password">
         </div>
 
-        <!-- Remember Me -->
         <div class="form-group">
           <label class="checkbox-label">
             <input type="checkbox" v-model="form.remember">
@@ -30,17 +24,14 @@
           </label>
         </div>
 
-        <!-- Error Message -->
         <div v-if="error" class="error-message">
           {{ error }}
         </div>
 
-        <!-- Submit Button -->
         <button type="submit" :disabled="loading" class="submit-btn">
           {{ loading ? 'Signing in...' : 'Sign in' }}
         </button>
 
-        <!-- Demo Info -->
         <div class="demo-info">
           <p><strong>Demo:</strong> ralph@email.com / Test123!</p>
           <button type="button" @click="fillTestUser" class="demo-btn">

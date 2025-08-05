@@ -1,5 +1,5 @@
 <template>
-  <div class="job-card" @click="$emit('click')">
+  <div class="job-card bg-blue-100" @click="$emit('click')">
     <div class="job-card__header">
       <h3 class="job-card__title">{{ job.title }}</h3>
       <span class="job-card__employment-type">{{ job.employment_type }}</span>

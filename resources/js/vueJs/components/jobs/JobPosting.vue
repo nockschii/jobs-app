@@ -1,41 +1,37 @@
 <template>
-  <div class="job-posting">
-    <div v-if="loading" class="loading">
-      <p>Loading job details...</p>
-    </div>
-    
-    <div v-else-if="selectedJob" class="job-detail">
-      <div class="job-detail-header">
-        <h1>{{ selectedJob.title }}</h1>
-        <span class="employment-badge">{{ selectedJob.employment_type }}</span>
+  <div class="job-posting-container">
+    <div class="job-posting bg-slate-300">
+      <div v-if="loading" class="loading">
+        <p>Loading job details...</p>
       </div>
-      
-      <div class="company-info">
-        <h3>{{ selectedJob.company?.name || 'Company not available' }}</h3>
-        <p class="location">📍 {{ formatLocation(selectedJob) }}</p>
+      <div v-else-if="selectedJob" class="job-detail">
+        <div class="job-detail-header">
+          <h1>{{ selectedJob.title }}</h1>
+          <span class="employment-badge">{{ selectedJob.employment_type }}</span>
+        </div>
+        <div class="company-info">
+          <h3>{{ selectedJob.company?.name || 'Company not available' }}</h3>
+          <p class="location"> {{ formatLocation(selectedJob) }}</p>
+        </div>
+        <div class="job-description">
+          <h4>Job Description</h4>
+          <p>{{ selectedJob.description || 'No description available.' }}</p>
+        </div>
+        <div class="job-requirements">
+          <h4>Requirements</h4>
+          <ul>
+            <li>Experience with relevant technologies</li>
+            <li>Strong communication skills</li>
+            <li>Team player mentality</li>
+          </ul>
+        </div>
+        <div class="apply-section">
+          <button class="apply-btn">Apply Now</button>
+        </div>
       </div>
-
-      <div class="job-description">
-        <h4>Job Description</h4>
-        <p>{{ selectedJob.description || 'No description available.' }}</p>
+      <div v-else class="no-selection">
+        <p>Select a job from the list to view details</p>
       </div>
-
-      <div class="job-requirements">
-        <h4>Requirements</h4>
-        <ul>
-          <li>Experience with relevant technologies</li>
-          <li>Strong communication skills</li>
-          <li>Team player mentality</li>
-        </ul>
-      </div>
-
-      <div class="apply-section">
-        <button class="apply-btn">Apply Now</button>
-      </div>
-    </div>
-    
-    <div v-else class="no-selection">
-      <p>Select a job from the list to view details</p>
     </div>
   </div>
 </template>
@@ -68,17 +64,53 @@ export default {
 </script>
 
 <style scoped>
+.job-posting-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 50%;
+  overflow: hidden;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+}
+
 .job-posting {
   flex: 1;
   padding: 2rem;
   overflow-y: auto;
+  height: 100%;
+  width: 100%;
+  margin: 1rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
 }
 
 .loading {
-  text-align: center;
-  padding: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
   color: #6c757d;
   font-style: italic;
+}
+
+.no-selection {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  color: #495057;
+  font-style: italic;
+  text-align: center;
+}
+
+.job-detail {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .job-detail-header {
@@ -113,15 +145,17 @@ export default {
 }
 
 .job-posting .location {
-  color:#495057;
+  color: #495057;
   margin: 0;
 }
 
-.job-description, .job-requirements {
+.job-description,
+.job-requirements {
   margin-bottom: 2rem;
 }
 
-.job-description h4, .job-requirements h4 {
+.job-description h4,
+.job-requirements h4 {
   color: #303030;
   margin-bottom: 1rem;
 }
@@ -143,23 +177,5 @@ export default {
 
 .apply-btn:hover {
   background: #218838;
-}
-
-.no-selection {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  color: #495057;
-  font-style: italic;
-}
-
-.loading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  color: #6c757d;
-  font-style: italic;
 }
 </style>

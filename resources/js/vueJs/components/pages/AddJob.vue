@@ -266,77 +266,13 @@ export default {
         this.error = 'Fehler beim Laden der Unternehmen';
       }
     },
-    
-    validateForm() {
-      this.errors = {};
-      
-      // Titel validieren (Pflichtfeld, max 120 Zeichen)
-      if (!this.form.title || this.form.title.trim().length === 0) {
-        this.errors.title = 'Titel ist erforderlich';
-      } else if (this.form.title.length > 120) {
-        this.errors.title = 'Titel darf maximal 120 Zeichen lang sein';
-      }
-      
-      // Bewerbungs-E-Mail validieren (Pflichtfeld, max 255 Zeichen)
-      if (!this.form.application_email || this.form.application_email.trim().length === 0) {
-        this.errors.application_email = 'Bewerbungs-E-Mail ist erforderlich';
-      } else if (this.form.application_email.length > 255) {
-        this.errors.application_email = 'E-Mail darf maximal 255 Zeichen lang sein';
-      } else {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(this.form.application_email)) {
-          this.errors.application_email = 'Bitte geben Sie eine gültige E-Mail-Adresse ein';
-        }
-      }
-      
-      // Unternehmen validieren (Pflichtfeld)
-      if (!this.form.company_id) {
-        this.errors.company_id = 'Bitte wählen Sie ein Unternehmen aus';
-      }
-      
-      // Optionale Felder validieren (nur Länge prüfen, falls ausgefüllt)
-      if (this.form.department && this.form.department.length > 50) {
-        this.errors.department = 'Abteilung darf maximal 50 Zeichen lang sein';
-      }
-      
-      if (this.form.city && this.form.city.length > 60) {
-        this.errors.city = 'Stadt darf maximal 60 Zeichen lang sein';
-      }
-      
-      if (this.form.country && this.form.country.length > 60) {
-        this.errors.country = 'Land darf maximal 60 Zeichen lang sein';
-      }
-      
-      if (this.form.application_url && this.form.application_url.length > 200) {
-        this.errors.application_url = 'URL darf maximal 200 Zeichen lang sein';
-      }
-      
-      // URL validieren (falls angegeben)
-      if (this.form.application_url) {
-        try {
-          new URL(this.form.application_url);
-        } catch {
-          this.errors.application_url = 'Bitte geben Sie eine gültige URL ein';
-        }
-      }
-      
-      return Object.keys(this.errors).length === 0;
-    },
-    
     async handleSubmit() {
-      if (!this.validateForm()) {
-        this.error = 'Bitte korrigieren Sie die Fehler in den markierten Feldern';
-        return;
-      }
-      
       this.loading = true;
       this.error = '';
       
       try {
         const jobData = { ...this.form };
-        
-        // Leere Strings in null konvertieren für nullable Felder
-        const nullableFields = ['description', 'department', 'city', 'country', 'application_url', 'employment_type'];
+              const nullableFields = ['description', 'department', 'city', 'country', 'application_url', 'employment_type'];
         nullableFields.forEach(field => {
           if (!jobData[field] || (typeof jobData[field] === 'string' && jobData[field].trim() === '')) {
             jobData[field] = null;
@@ -345,11 +281,9 @@ export default {
         
         const response = await createJob(jobData);
         this.$emit('job-created', response.data);
-        // Erfolgreiche Erstellung - zur Startseite weiterleiten
         window.location.href = '/';
       } catch (error) {
         if (error.response?.status === 422) {
-          // Validierungsfehler vom Server
           const serverErrors = error.response.data.errors || {};
           this.errors = { ...this.errors, ...serverErrors };
           this.error = 'Bitte überprüfen Sie Ihre Eingabedaten';
@@ -415,7 +349,6 @@ export default {
 }
 
 .job-form {
-  background: white;
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 2rem;

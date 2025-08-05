@@ -6,27 +6,22 @@
         {{ jobs.length }} {{ jobs.length === 1 ? 'Ergebnis' : 'Ergebnisse' }} gefunden
       </span>
     </div>
-    
+
     <div v-if="loading" class="loading">
       {{ searchActive ? 'Suche läuft...' : 'Lade Stellenausschreibungen...' }}
     </div>
-    
+
     <div v-else-if="jobs.length === 0 && searchActive" class="no-results">
       <p>Keine Stellenausschreibungen für Ihre Suche gefunden.</p>
       <small>Versuchen Sie andere Suchbegriffe oder überprüfen Sie die Schreibweise.</small>
     </div>
-    
+
     <div v-else-if="jobs.length === 0" class="no-jobs">
       <p>Momentan sind keine Stellenausschreibungen verfügbar.</p>
     </div>
-    
+
     <div v-else class="jobs-container">
-      <JobCard 
-        v-for="job in jobs" 
-        :key="job.id" 
-        :job="job" 
-        @click="selectJob(job)"
-      />
+      <JobCard v-for="job in jobs" :key="job.id" :job="job" @click="selectJob(job)" />
     </div>
   </div>
 </template>
