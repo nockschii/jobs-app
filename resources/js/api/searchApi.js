@@ -14,6 +14,11 @@ export function searchJobs(searchterm) {
   });
 }
 
+export function storeSearchTerm(searchterm, userInfo = {}) {
+  return axios.post(`${BASE_URL}/store`, { searchterm, userInfo });
+}
+
 export default {
-  searchJobs
+  searchJobs,
+  storeSearchTerm
 };

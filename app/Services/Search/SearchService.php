@@ -54,7 +54,7 @@ class SearchService
     {
         $results = $this->search($searchterm);
         $flatResults = collect();
-
+        
         $results->each(function ($algorithmResult) use ($flatResults) {
             $algorithmResult['jobs']->each(function ($job) use ($flatResults, $algorithmResult) {
                 $job['found_by_algorithm'] = $algorithmResult['algorithm'];
@@ -72,11 +72,13 @@ class SearchService
         return SearchTerm::create([
             'term' => $searchterm,
             'results_count' => $resultsCount,
-            'user_id' => $user ? $user->id : null,
+            'user_id' => $user?->id,
             'ip_address' => $userInfo['ip_address'] ?? request()->ip(),
             'user_agent' => $userInfo['user_agent'] ?? request()->header('User-Agent'),
             'session_id' => $userInfo['session_id'] ?? session()->getId(),
             'referer' => $userInfo['referer'] ?? request()->header('Referer'),
+            'platform' => $userInfo['platform'] ?? null,
+            'screen' => $userInfo['screen'] ?? null,
         ]);
     }
 }

@@ -1,28 +1,16 @@
 <template>
   <div class="home-page">
     <div class="search-section">
-      <SearchBar @search="handleSearch" :loading="searchLoading" />
-    </div>
-    
-    <div class="content">
-      <JobList 
-        :jobs="displayJobs" 
-        :loading="searchLoading" 
-        :search-active="isSearchActive"
-        @job-selected="handleJobSelection" 
-      />
-      <JobPosting 
-        :selected-job="selectedJobDetails" 
-        :loading="loadingJobDetails"
-        @error="handleJobError"
-      />
+      <SearchBar @search="handleSearch" :loading="searchLoading" :clear-trigger="searchClearKey" />
     </div>
 
-    <ErrorModal 
-      :show="showError" 
-      :message="errorMessage" 
-      @close="closeError" 
-    />
+    <div class="content">
+      <JobList :jobs="displayJobs" :loading="searchLoading" :search-active="isSearchActive"
+        @job-selected="handleJobSelection" />
+      <JobPosting :selected-job="selectedJobDetails" :loading="loadingJobDetails" @error="handleJobError" />
+    </div>
+
+    <ErrorModal :show="showError" :message="errorMessage" @close="closeError" />
   </div>
 </template>
 
@@ -31,7 +19,7 @@ import SearchBar from '../search/SearchBar.vue';
 import JobList from '../jobs/JobList.vue';
 import JobPosting from '../jobs/JobPosting.vue';
 import ErrorModal from '../ErrorModal.vue';
-import { searchJobs } from '@api/searchApi.js';
+import { searchJobs, storeSearchTerm } from '@api/searchApi.js';
 import { fetchJobs, fetchJobDetails } from '@api/jobsApi.js';
 
 export default {
@@ -41,6 +29,12 @@ export default {
     JobList,
     JobPosting,
     ErrorModal
+  },
+  props: {
+    searchClearKey: {
+      type: Number,
+      default: 0
+    }
   },
   data() {
     return {
@@ -80,7 +74,7 @@ export default {
       this.selectedJob = job;
       this.selectedJobDetails = null;
       this.loadingJobDetails = true;
-      
+
       try {
         const response = await fetchJobDetails(job.id);
         this.selectedJobDetails = response.data;
@@ -101,10 +95,17 @@ export default {
 
       this.searchLoading = true;
       this.isSearchActive = true;
-      
+      const userInfo = {
+        user_agent: navigator.userAgent,
+        referer: document.referrer,
+        platform: navigator.platform,
+        screen: `${window.screen.width}x${window.screen.height}`,
+      };
+
       try {
         const response = await searchJobs(searchTerm);
         this.searchResults = response.data;
+        await storeSearchTerm(searchTerm, userInfo);;
       } catch (error) {
         this.handleApiError(error, 'Search');
         this.searchResults = [];
@@ -114,7 +115,7 @@ export default {
     },
     handleApiError(error, context = 'Operation') {
       this.showError = true;
-      
+
       let errorMessage;
       if (context === 'Search') {
         errorMessage = `Search failed: ${error.response?.data?.message || error.message || 'Unable to perform search. Please check your connection and try again.'}`;
@@ -123,7 +124,7 @@ export default {
       } else {
         errorMessage = `${context} failed: ${error.response?.data?.message || error.message || 'An error occurred'}`;
       }
-      
+
       this.errorMessage = errorMessage;
     },
     handleJobError(errorMessage) {
