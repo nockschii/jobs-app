@@ -2,26 +2,16 @@
   <div class="search-bar">
     <div class="search-container">
       <div class="search-input-group">
-        <input 
-          type="text" 
-          v-model="searchQuery"
-          placeholder="Suche nach Jobtitel, Stadt oder Land..."
-          class="search-input"
-          @keyup.enter="performSearch"
-        />
-        <button 
-          v-if="searchQuery" 
-          @click="clearSearch" 
-          class="clear-search-btn"
-          type="button"
-        >
+        <input type="text" v-model="searchQuery" placeholder="Suche nach Jobtitel, Stadt oder Land..."
+          class="search-input" @keyup.enter="performSearch" />
+        <button v-if="searchQuery" @click="clearSearch" class="clear-search-btn" type="button">
           ✕
         </button>
         <button @click="performSearch" class="search-btn" :disabled="loading">
           {{ loading ? 'Suche...' : 'Suchen' }}
         </button>
       </div>
-      
+
       <div class="search-info" v-if="searchQuery">
         <small>Suche in Stellentiteln, Städten und Ländern</small>
       </div>
@@ -36,6 +26,15 @@ export default {
     loading: {
       type: Boolean,
       default: false
+    },
+    clearTrigger: {
+      type: [Number, String, Boolean],
+      default: 0
+    }
+  },
+  watch: {
+    clearTrigger() {
+      this.clearSearch();
     }
   },
   data() {

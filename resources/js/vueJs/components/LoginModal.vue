@@ -13,25 +13,13 @@
         <!-- Email -->
         <div class="form-group">
           <label for="email">Email</label>
-          <input
-            id="email"
-            type="email"
-            required
-            v-model="form.email"
-            placeholder="Email address"
-          >
+          <input id="email" type="email" required v-model="form.email" placeholder="Email address">
         </div>
 
         <!-- Password -->
         <div class="form-group">
           <label for="password">Password</label>
-          <input
-            id="password"
-            type="password"
-            required
-            v-model="form.password"
-            placeholder="Password"
-          >
+          <input id="password" type="password" required v-model="form.password" placeholder="Password">
         </div>
 
         <!-- Remember Me -->
@@ -91,7 +79,7 @@ export default {
       this.$emit('close');
       this.clearForm();
     },
-    
+
     clearForm() {
       this.form = {
         email: '',
@@ -100,29 +88,27 @@ export default {
       };
       this.error = '';
     },
-    
+
     fillTestUser() {
       this.form.email = 'ralph@email.com';
       this.form.password = 'Test123!';
     },
-    
+
     async handleSubmit() {
       this.loading = true;
       this.error = '';
-      
+
       try {
         const response = await login(this.form);
-        
+
         if (response.data && response.data.user) {
-          localStorage.setItem('user', JSON.stringify(response.data.user));
-          
           this.$emit('login-success', response.data.user);
           this.closeModal();
         } else {
           console.log('Unexpected response structure:', response.data);
           this.error = 'Unexpected response from server';
         }
-        
+
       } catch (error) {
         if (error.response?.status === 422) {
           this.error = 'Invalid credentials';

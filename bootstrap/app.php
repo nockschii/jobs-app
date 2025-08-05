@@ -3,6 +3,10 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
+use Illuminate\Http\Middleware\HandleCors;
+use App\Http\Middleware\AbortIfNotAuthenticated;
+
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -12,12 +16,22 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        $middleware->api(prepend: [
-            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+
+        $middleware->alias([
+            'auth.sanctum.redirect' => AbortIfNotAuthenticated::class,
         ]);
 
-        //
+        $middleware->append([
+            HandleCors::class,
+        ]);
+
+        // Falls du Sanctum verwendest
+        $middleware->api(prepend: [
+            EnsureFrontendRequestsAreStateful::class,
+
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
-    })->create();
+    })
+    ->create();
